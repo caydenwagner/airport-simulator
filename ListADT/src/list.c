@@ -80,13 +80,66 @@ void lstCreate (ListPtr psList)
 
  Description:
 
- Parameters:	psList - List pointer that is initialized to default
- 	 	 	 	 	 	 values
+ Parameters:
 
  Returned:		None
  *************************************************************************/
 
 void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
 {
+	if ( NULL == psList )
+	{
+		processError("lstInsertAfter", ERROR_INVALID_LIST);
+	}
 
+	ListElementPtr psTemp;
+
+	psTemp = (ListElementPtr) malloc(sizeof(ListElement));
+	psTemp->pData = malloc(size);
+	memcpy(psTemp->pData, pBuffer, size);
+	psTemp->psNext = NULL;
+
+	if (psList->psCurrent == NULL)
+	{
+		psList->psFirst = psTemp;
+		psList->psLast = psTemp;
+		psList->psCurrent = psTemp;
+	}
+	else if (psList->psCurrent->psNext == NULL)
+	{
+		psList->psCurrent->psNext = psTemp;
+		psList->psCurrent = psTemp;
+		psList->psLast = psTemp;
+	}
+	else
+	{
+		psTemp->psNext = psList->psCurrent->psNext;
+		psList->psCurrent->psNext = psTemp;
+		psList->psCurrent = psTemp;
+	}
+	psList->numElements++;
+}
+
+/**************************************************************************
+ Function: 	 	lstPeek
+
+ Description:
+
+ Parameters:
+
+ Returned:		None
+ *************************************************************************/
+void *lstPeek (const ListPtr psList, void *pBuffer, int size){
+	if ( psList == NULL )
+	{
+		processError("lstPeek", ERROR_NULL_PTR);
+	}
+	if ( psList->numElements == 0)
+	{
+		processError("lstPeek", ERROR_EMPTY_LIST);
+	}
+	if (psList->psCurrent == NULL)
+	{
+		processError("lstPeek", ERROR_NO_CURRENT);
+	}
 }

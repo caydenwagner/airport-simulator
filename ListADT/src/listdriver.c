@@ -64,8 +64,18 @@ static void assert(bool bExpression, char *pTrue, char *pFalse) {
  *************************************************************************/
 
 int main() {
+  List sMyList;
+  int num1 = 1, num2 = 2, num3 = 3;
+
   lstLoadErrorMessages();
   success("Loaded Error Messages");
+
+  lstCreate(&sMyList);
+
+  lstInsertAfter(&sMyList, &num1, sizeof(int));
+  lstInsertAfter(&sMyList, &num2, sizeof(int));
+  lstInsertAfter(&sMyList, &num3, sizeof(int));
+
 
 
 
