@@ -65,16 +65,27 @@ static void assert(bool bExpression, char *pTrue, char *pFalse) {
 
 int main() {
   List sMyList;
-  int num1 = 1, num2 = 2, num3 = 3;
+  char num1 = '1', num2 = '2', num3 = '3';
+  char *value = NULL;
 
   lstLoadErrorMessages();
   success("Loaded Error Messages");
 
   lstCreate(&sMyList);
 
-  lstInsertAfter(&sMyList, &num1, sizeof(int));
-  lstInsertAfter(&sMyList, &num2, sizeof(int));
-  lstInsertAfter(&sMyList, &num3, sizeof(int));
+  lstInsertAfter(&sMyList, &num1, sizeof(char));
+  value = lstPeek(&sMyList, value, sizeof(char));
+  printf("%c\n", *value);
+
+  lstInsertAfter(&sMyList, &num2, sizeof(char));
+  value = lstPeek(&sMyList, value, sizeof(char));
+  printf("%c\n", *value);
+
+  lstInsertAfter(&sMyList, &num3, sizeof(char));
+  value = lstPeek(&sMyList, value, sizeof(char));
+  printf("%c\n", *value);
+
+  lstTerminate(&sMyList);
 
 
 
