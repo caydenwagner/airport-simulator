@@ -179,3 +179,41 @@ void lstTerminate (ListPtr psList)
 	psList->psCurrent = NULL;
 	psList->psLast = NULL;
 }
+
+/**************************************************************************
+ Function: 	 	lstSize
+
+ Description:
+
+ Parameters:
+
+ Returned:		None
+ *************************************************************************/
+int lstSize (const ListPtr psList)
+{
+	if (NULL == psList)
+	{
+		processError("lstSize", ERROR_INVALID_LIST);
+	}
+
+	return psList->numElements;
+}
+
+/**************************************************************************
+ Function: 	 	lstIsEmpty
+
+ Description:
+
+ Parameters:
+
+ Returned:		None
+ *************************************************************************/
+bool lstIsEmpty (const ListPtr psList)
+{
+	if ( NULL == psList)
+	{
+		processError("lstSize", ERROR_INVALID_LIST);
+	}
+
+	return (psList->numElements == 0);
+}
