@@ -1,8 +1,8 @@
 /**************************************************************************
  File name:  	 list.c
  Author:     	 Computer Science, Pacific University
- Date:			 9.21.16
- Class:			 CS300
+ Date:			 	 9.21.16
+ Class:			 	 CS300
  Assignment:
  Purpose:
  *************************************************************************/
@@ -17,14 +17,14 @@ char gszListErrors[NUMBER_OF_LIST_ERRORS][MAX_ERROR_LIST_CHARS];
 
 
 /**************************************************************************
- Function: 	 	lstLoadErrorMessages
+ Function: 	 		lstLoadErrorMessages
 
  Description: 	Initializes the string of error messages. LOAD_ERRORS is a
- 	 	 	 	macro defined in the header file.
+ 	 	 	 					macro defined in the header file.
 
- Parameters:	None
+ Parameters:		None
 
- Returned:	 	None
+ Returned:	 		None
  *************************************************************************/
 
 void lstLoadErrorMessages ()
@@ -33,31 +33,30 @@ void lstLoadErrorMessages ()
 }
 
 /**************************************************************************
- Function: 	 	processError
+ Function: 	 		processError
 
  Description:   Process the error code passed to this routine
 
- Parameters:	pszFunctionName - function causing the error
- 	 	 	 	errorCode 	    - identifies the list error
+ Parameters:		pszFunctionName - function causing the error
+ 	 	 	 					errorCode 	    - identifies the list error
 
- Returned:	 	None
+ Returned:	 		None
  *************************************************************************/
 
 static void processError (const char *pszFunctionName, int errorCode)
 {
 	printf ("Function: %s %s \n ", pszFunctionName,
-			 gszListErrors [errorCode]);
-	exit (EXIT_FAILURE);
+			gszListErrors [errorCode]);
+  exit (EXIT_FAILURE);
 }
 
 /**************************************************************************
- Function: 	 	lstCreate
+ Function: 	 		lstCreate
 
- Description:	Initializes pointers in the list to NULL and number of
- 	 	 	 	elements to 0
+ Description:		Initializes pointers in the list to NULL and number of
+ 	 	 	 					elements to 0
 
- Parameters:	psList - List pointer that is initialized to default
- 	 	 	 	 	 	 values
+ Parameters:		psList - a pointer to the list
 
  Returned:		None
  *************************************************************************/
@@ -76,13 +75,17 @@ void lstCreate (ListPtr psList)
 }
 
 /**************************************************************************
- Function: 	 	lstInsertAfter
+ Function: 	 		lstInsertAfter
 
- Description:
+ Description:		Insert the new element as the successor of the current
+ 	 	 	 	 	 	 	 	element pointed to by psCurrent
 
- Parameters:
+ Parameters:		psList  -  a pointer to the list
+ 	 	 	 	 	 	 	 	pBuffer -	 a pointer to data that is inserted as the
+ 	 	 	 	 	 	 	 						 successor of psCurrent
+ 	 	 	 	 	 	 	 	size    -	 the size of the data pointed to by pBuffer
 
- Returned:		None
+ Returned:			None
  *************************************************************************/
 
 void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
@@ -95,11 +98,6 @@ void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
 	if ( NULL == pBuffer )
 	{
 		processError("lstInsertAfter", ERROR_NULL_PTR);
-	}
-
-	if ( NULL == psList->psCurrent )
-	{
-		processError("lstInsertAfter", ERROR_NO_CURRENT);
 	}
 
 	ListElementPtr psTemp = (ListElementPtr) malloc(sizeof(ListElement));
@@ -129,20 +127,26 @@ void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
 		psList->psCurrent->psNext = psTemp;
 		psList->psCurrent = psTemp;
 	}
+
 	psList->numElements++;
+
 }
 
 /**************************************************************************
- Function: 	 	lstPeek
+ Function: 	 		lstPeek
 
- Description:
+ Description:		Accesses the value of the element pointed to by psCurrent
 
- Parameters:
+ Parameters:		psList  -  a pointer to the list
+ 	 	 	 	 	 	 	 	pBuffer -	 a pointer to buffer space which stores the value
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 of the element pointed to by psCurrent
+ 	 	 	 	 	 	 	 	size    -	 the size of the data pointed to by psCurrent
 
- Returned:		None
+ Returned:			None
  *************************************************************************/
 
-void *lstPeek (const ListPtr psList, void *pBuffer, int size){
+void *lstPeek (const ListPtr psList, void *pBuffer, int size)
+{
 	if ( psList == NULL )
 	{
 		processError("lstPeek", ERROR_NULL_PTR);
@@ -162,13 +166,14 @@ void *lstPeek (const ListPtr psList, void *pBuffer, int size){
 }
 
 /**************************************************************************
- Function: 	 	lstTerminate
+ Function: 	 		lstTerminate
 
- Description:
+ Description:		Terminates all elements of the list and points the psFirst,
+  							psLast, and psCurrent to NULL
 
- Parameters:
+ Parameters:		psList - a pointer to the list
 
- Returned:		None
+ Returned:			None
  *************************************************************************/
 
 void lstTerminate (ListPtr psList)
@@ -182,7 +187,9 @@ void lstTerminate (ListPtr psList)
 	{
 		psNext = psList->psCurrent->psNext;
 		psList->psCurrent = psList->psCurrent->psNext;
+
 		free(psTemp);
+
 		psTemp = psNext;
 	}
 
@@ -193,13 +200,13 @@ void lstTerminate (ListPtr psList)
 }
 
 /**************************************************************************
- Function: 	 	lstSize
+ Function: 	 		lstSize
 
- Description:
+ Description:		Accesses the number of elements in the list
 
- Parameters:
+ Parameters:		psList - a pointer to the list
 
- Returned:		None
+ Returned:			The amount of elements in the list
  *************************************************************************/
 
 int lstSize (const ListPtr psList)
@@ -213,13 +220,13 @@ int lstSize (const ListPtr psList)
 }
 
 /**************************************************************************
- Function: 	 	lstIsEmpty
+ Function: 	 		lstIsEmpty
 
- Description:
+ Description:		Determines if the list is empty or not
 
- Parameters:
+ Parameters:		psList - a pointer to the list
 
- Returned:		None
+ Returned:			True if the list is empty, else false
  *************************************************************************/
 
 bool lstIsEmpty (const ListPtr psList)
@@ -230,4 +237,60 @@ bool lstIsEmpty (const ListPtr psList)
 	}
 
 	return (psList->numElements == 0);
+}
+
+/**************************************************************************
+ Function: 	 		lstFirst
+
+ Description:		Sets psCurrent to the first element in the list
+
+ Parameters:		psList - a pointer to the list
+
+ Returned:			None
+ *************************************************************************/
+
+void lstFirst (ListPtr psList)
+{
+	if ( NULL == psList)
+	{
+		processError("lstFirst", ERROR_INVALID_LIST);
+	}
+	if ( psList->numElements == 0 )
+	{
+		processError("lstFirst", ERROR_EMPTY_LIST);
+	}
+
+	psList->psCurrent = psList->psFirst;
+}
+
+/**************************************************************************
+ Function: 	 		lstNext
+
+ Description:
+
+ Parameters:
+
+ Returned:
+ *************************************************************************/
+
+void lstNext (ListPtr psList)
+{
+	if ( NULL == psList)
+	{
+		processError("lstNext", ERROR_INVALID_LIST);
+	}
+	if ( psList->numElements == 0 )
+	{
+		processError("lstNext", ERROR_EMPTY_LIST);
+	}
+	if ( psList->psCurrent == NULL )
+	{
+		processError("lstNext", ERROR_NO_CURRENT);
+	}
+	if ( psList->psCurrent->psNext == NULL )
+	{
+		processError("lstNext", ERROR_NO_NEXT);
+	}
+
+	psList->psCurrent = psList->psCurrent->psNext;
 }
