@@ -1,5 +1,5 @@
 /**************************************************************************
- File name:		list.h
+ File name:			list.h
  Author:        CS, Pacific University
  Date:          09.19.2019
  Class:         CS300

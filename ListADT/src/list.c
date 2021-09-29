@@ -3,8 +3,7 @@
  Author:     	 Computer Science, Pacific University
  Date:			 	 9.21.16
  Class:			 	 CS300
- Assignment:
- Purpose:
+ Assignment:	 ListADT
  *************************************************************************/
 
 #include <stdio.h>
@@ -58,7 +57,7 @@ static void processError (const char *pszFunctionName, int errorCode)
 
  Parameters:		psList - a pointer to the list
 
- Returned:		None
+ Returned:			None
  *************************************************************************/
 
 void lstCreate (ListPtr psList)
@@ -98,6 +97,10 @@ void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
 	if ( NULL == pBuffer )
 	{
 		processError("lstInsertAfter", ERROR_NULL_PTR);
+	}
+	if (NULL == psList->psCurrent && psList->numElements != 0 )
+	{
+		processError("lstInsertAfter", ERROR_NO_CURRENT);
 	}
 
 	ListElementPtr psTemp = (ListElementPtr) malloc(sizeof(ListElement));
@@ -149,6 +152,10 @@ void *lstPeek (const ListPtr psList, void *pBuffer, int size)
 {
 	if ( psList == NULL )
 	{
+		processError("lstPeek", ERROR_INVALID_LIST);
+	}
+	if ( pBuffer == NULL )
+	{
 		processError("lstPeek", ERROR_NULL_PTR);
 	}
 	if ( psList->numElements == 0)
@@ -160,7 +167,7 @@ void *lstPeek (const ListPtr psList, void *pBuffer, int size)
 		processError("lstPeek", ERROR_NO_CURRENT);
 	}
 
-	pBuffer = psList->psCurrent->pData;
+	memcpy(pBuffer, psList->psCurrent->pData, size);
 
 	return pBuffer;
 }
@@ -178,6 +185,11 @@ void *lstPeek (const ListPtr psList, void *pBuffer, int size)
 
 void lstTerminate (ListPtr psList)
 {
+	if (NULL == psList )
+	{
+		processError("lstTerminate", ERROR_NO_LIST_TERMINATE);
+	}
+
 	ListElementPtr psTemp = psList->psFirst;
 	ListElementPtr psNext = NULL;
 
@@ -188,6 +200,7 @@ void lstTerminate (ListPtr psList)
 		psNext = psList->psCurrent->psNext;
 		psList->psCurrent = psList->psCurrent->psNext;
 
+		free(psTemp->pData);
 		free(psTemp);
 
 		psTemp = psNext;
@@ -266,11 +279,11 @@ void lstFirst (ListPtr psList)
 /**************************************************************************
  Function: 	 		lstNext
 
- Description:
+ Description:		Sets psCurrent to the next element in the list
 
- Parameters:
+ Parameters:		psList - a pointer to the list
 
- Returned:
+ Returned:			None
  *************************************************************************/
 
 void lstNext (ListPtr psList)
@@ -286,10 +299,6 @@ void lstNext (ListPtr psList)
 	if ( psList->psCurrent == NULL )
 	{
 		processError("lstNext", ERROR_NO_CURRENT);
-	}
-	if ( psList->psCurrent->psNext == NULL )
-	{
-		processError("lstNext", ERROR_NO_NEXT);
 	}
 
 	psList->psCurrent = psList->psCurrent->psNext;
