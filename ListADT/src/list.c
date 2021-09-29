@@ -26,11 +26,11 @@ char gszListErrors[NUMBER_OF_LIST_ERRORS][MAX_ERROR_LIST_CHARS];
 
  Returned:	 	None
  *************************************************************************/
+
 void lstLoadErrorMessages ()
 {
 	LOAD_LIST_ERRORS
 }
-
 
 /**************************************************************************
  Function: 	 	processError
@@ -92,6 +92,16 @@ void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
 		processError("lstInsertAfter", ERROR_INVALID_LIST);
 	}
 
+	if ( NULL == pBuffer )
+	{
+		processError("lstInsertAfter", ERROR_NULL_PTR);
+	}
+
+	if ( NULL == psList->psCurrent )
+	{
+		processError("lstInsertAfter", ERROR_NO_CURRENT);
+	}
+
 	ListElementPtr psTemp = (ListElementPtr) malloc(sizeof(ListElement));
 	void* temp = malloc(sizeof(temp));
 
@@ -131,6 +141,7 @@ void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
 
  Returned:		None
  *************************************************************************/
+
 void *lstPeek (const ListPtr psList, void *pBuffer, int size){
 	if ( psList == NULL )
 	{
@@ -159,6 +170,7 @@ void *lstPeek (const ListPtr psList, void *pBuffer, int size){
 
  Returned:		None
  *************************************************************************/
+
 void lstTerminate (ListPtr psList)
 {
 	ListElementPtr psTemp = psList->psFirst;
@@ -189,6 +201,7 @@ void lstTerminate (ListPtr psList)
 
  Returned:		None
  *************************************************************************/
+
 int lstSize (const ListPtr psList)
 {
 	if (NULL == psList)
@@ -208,6 +221,7 @@ int lstSize (const ListPtr psList)
 
  Returned:		None
  *************************************************************************/
+
 bool lstIsEmpty (const ListPtr psList)
 {
 	if ( NULL == psList)
