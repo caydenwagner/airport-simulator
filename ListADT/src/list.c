@@ -104,12 +104,10 @@ void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
 	}
 
 	ListElementPtr psTemp = (ListElementPtr) malloc(sizeof(ListElement));
-	void* temp = malloc(sizeof(size));
+	psTemp->pData = (void *) malloc(sizeof(void *));
 
 	psTemp->psNext = NULL;
-	memcpy(temp, pBuffer, sizeof(size));
-
-	psTemp->pData = temp;
+	memcpy(psTemp->pData, pBuffer, sizeof(void *));
 
 	if (psList->psCurrent == NULL)
 	{
