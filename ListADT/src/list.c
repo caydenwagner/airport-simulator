@@ -142,7 +142,7 @@ void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
  	 	 	 	 	 	 	 	 	 	 	 	 	 of the element pointed to by psCurrent
  	 	 	 	 	 	 	 	size    -	 the size of the data pointed to by psCurrent
 
- Returned:			None
+ Returned:			The data contained in the current node
  *************************************************************************/
 
 void *lstPeek (const ListPtr psList, void *pBuffer, int size)
@@ -299,4 +299,113 @@ void lstNext (ListPtr psList)
 	}
 
 	psList->psCurrent = psList->psCurrent->psNext;
+}
+
+/**************************************************************************
+ Function: 	 		lsHasCurrent
+
+ Description:		Determines if the list has a node pointed to by psCurrent
+
+ Parameters:		psList - a pointer to the list
+
+ Returned:			True if the node pointed to by psCurrent is not NULL,
+ 	 	 	 	 	 	 	 	else false
+ *************************************************************************/
+
+bool lstHasCurrent (const ListPtr psList)
+{
+	if ( NULL == psList)
+	{
+		processError("lstHasCurrent", ERROR_INVALID_LIST);
+	}
+
+	return ( NULL == psList->psCurrent );
+}
+
+/**************************************************************************
+ Function: 	 		lsHasNext
+
+ Description:		Determines if the list has a successor to the node pointed
+								to by psCurrent
+
+ Parameters:		psList - a pointer to the list
+
+ Returned:			True if the list has a successor to the current node, else
+  							false
+ *************************************************************************/
+
+bool lstHasNext (const ListPtr psList)
+{
+	if ( NULL == psList)
+	{
+		processError("lstHasNext", ERROR_INVALID_LIST);
+	}
+
+		return ( NULL == psList->psCurrent->psNext );
+}
+
+/**************************************************************************
+ Function: 	 		lstPeekNext
+
+ Description:		Accesses the value of the successor to the element pointed
+ 	 	 	 	 	 	 	 	to by psCurrent
+
+ Parameters:		psList  -  a pointer to the list
+ 	 	 	 	 	 	 	 	pBuffer -	 a pointer to buffer space which stores the value
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 of the element pointed to by psCurrent
+ 	 	 	 	 	 	 	 	size    -	 the size of the data pointed to by psCurrent
+
+ Returned:			The data contained in the successor the current node
+ *************************************************************************/
+
+void *lstPeekNext (const ListPtr psList, void *pBuffer, int size)
+{
+	if ( psList == NULL )
+	{
+		processError("lstPeekNext", ERROR_INVALID_LIST);
+	}
+	if ( pBuffer == NULL )
+	{
+		processError("lstPeekNext", ERROR_NULL_PTR);
+	}
+	if ( psList->numElements == 0)
+	{
+		processError("lstPeekNext", ERROR_EMPTY_LIST);
+	}
+	if (psList->psCurrent == NULL)
+	{
+		processError("lstPeekNext", ERROR_NO_CURRENT);
+	}
+	if (psList->psCurrent->psNext == NULL)
+	{
+		processError("lstPeekNext", ERROR_NO_NEXT);
+	}
+
+	memcpy(pBuffer, psList->psCurrent->psNext->pData, size);
+
+	return pBuffer;
+}
+
+/**************************************************************************
+ Function: 	 		lstLast
+
+ Description:		Sets psCurrent to the last element in the list
+
+ Parameters:		psList - a pointer to the list
+
+ Returned:			None
+ *************************************************************************/
+
+void lstLast (ListPtr psList)
+{
+	if ( NULL == psList)
+	{
+		processError("lstLast", ERROR_INVALID_LIST);
+	}
+	if ( psList->numElements == 0 )
+	{
+		processError("lstLast", ERROR_EMPTY_LIST);
+	}
+
+	psList->psCurrent = psList->psLast;
 }
