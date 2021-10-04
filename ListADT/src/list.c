@@ -104,10 +104,10 @@ void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
 	}
 
 	ListElementPtr psTemp = (ListElementPtr) malloc(sizeof(ListElement));
-	psTemp->pData = (void *) malloc(sizeof(void *));
+	psTemp->pData = malloc(sizeof(size));
 
 	psTemp->psNext = NULL;
-	memcpy(psTemp->pData, pBuffer, sizeof(void *));
+	memcpy(psTemp->pData, pBuffer, size);
 
 	if (psList->psCurrent == NULL)
 	{
@@ -408,4 +408,166 @@ void lstLast (ListPtr psList)
 	}
 
 	psList->psCurrent = psList->psLast;
+}
+
+/**************************************************************************
+ Function: 	 		lstUpdateCurrent
+
+ Description:		Updates the value stored in the node pointed to by psCurrent
+
+ Parameters:		psList  -  a pointer to the list
+ 	 	 	 	 	 	 	 	pBuffer -	 a pointer to the data that is inserted into
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 psCurrent
+ 	 	 	 	 	 	 	 	size    -	 the size of the data pointed that is inserted
+
+ Returned:			None
+ *************************************************************************/
+
+void lstUpdateCurrent (ListPtr psList, const void *pBuffer,
+											 int size)
+{
+	if ( psList == NULL )
+	{
+		processError("lstUpdateCurrent", ERROR_INVALID_LIST);
+	}
+	if ( pBuffer == NULL )
+	{
+		processError("lstUpdateCurrent", ERROR_NULL_PTR);
+	}
+	if ( psList->numElements == 0)
+	{
+		processError("lstUpdateCurrent", ERROR_EMPTY_LIST);
+	}
+	if (psList->psCurrent == NULL)
+	{
+		processError("lstUpdateCurrent", ERROR_NO_CURRENT);
+	}
+
+	free(psList->psCurrent->pData);
+	psList->psCurrent->pData = malloc(size);
+
+	memcpy(psList->psCurrent, pBuffer, size);
+}
+
+/**************************************************************************
+ Function: 	 		lstDeleteCurrent
+
+ Description:		Deletes the element stored in current and adjusts the list
+ 	 	 	 	 	 	 	 	so that it is still connected by pointers
+
+ Parameters:		psList  -  a pointer to the list
+ 	 	 	 	 	 	 	 	pBuffer -	 a pointer to buffer space which stores the value
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 of the element pointed to by psCurrent
+ 	 	 	 	 	 	 	 	size    -	 the size of the data pointed to by psCurrent
+
+ Returned:			Returns the value of the node that is deleted
+ *************************************************************************/
+
+void *lstDeleteCurrent (ListPtr psList, void *pBuffer, int size)
+{
+	if ( psList == NULL )
+	{
+		processError("lstDeleteCurrent", ERROR_INVALID_LIST);
+	}
+	if ( pBuffer == NULL )
+	{
+		processError("lstDeleteCurrent", ERROR_NULL_PTR);
+	}
+	if ( psList->numElements == 0)
+	{
+		processError("lstDeleteCurrent", ERROR_EMPTY_LIST);
+	}
+	if (psList->psCurrent == NULL)
+	{
+		processError("lstDeleteCurrent", ERROR_NO_CURRENT);
+	}
+
+	ListElementPtr psTemp;
+
+	psTemp = psList->psFirst;
+
+	memcpy(psList->psCurrent->pData, pBuffer, size);
+
+	if (psTemp == psList->psCurrent)
+	{
+		psList->psFirst = psList->psCurrent->psNext;
+
+		free(psList->psCurrent->pData);
+		free(psList->psCurrent);
+
+		psList->psCurrent = psList->psFirst;
+	}
+	else
+	{
+		while(psTemp->psNext != psList->psCurrent)
+		{
+			psTemp = psTemp->psNext;
+		}
+
+		if (psList->psCurrent->psNext != NULL)
+		{
+			psTemp->psNext = psList->psCurrent->psNext;
+		}
+
+		free(psList->psCurrent->pData);
+		free(psList->psCurrent);
+
+		psList->psCurrent = psTemp;
+	}
+
+	return pBuffer;
+}
+
+/**************************************************************************
+ Function: 	 		lstInsertBefore
+
+ Description:		Insert the new element as the predecessor of the current
+ 	 	 	 	 	 	 	 	element pointed to by psCurrent
+
+ Parameters:		psList  -  a pointer to the list
+ 	 	 	 	 	 	 	 	pBuffer -	 a pointer to data that is inserted as the
+ 	 	 	 	 	 	 	 						 predecessor of psCurrent
+ 	 	 	 	 	 	 	 	size    -	 the size of the data pointed to by pBuffer
+
+ Returned:			None
+ *************************************************************************/
+
+void lstInsertBefore (ListPtr psList, const void *pBuffer, int size)
+{
+	if ( NULL == psList )
+	{
+		processError("lstInsertBefore", ERROR_INVALID_LIST);
+	}
+	if ( NULL == pBuffer )
+	{
+		processError("lstInsertBeforer", ERROR_NULL_PTR);
+	}
+	if (NULL == psList->psCurrent && psList->numElements != 0 )
+	{
+		processError("lstInsertBeforer", ERROR_NO_CURRENT);
+	}
+
+		ListElementPtr psFinder, psTemp = (ListElementPtr) malloc(sizeof(ListElement));
+		psTemp->pData = malloc(sizeof(size));
+
+		memcpy(psTemp->pData, pBuffer, size);
+		psTemp->psNext = psList->psCurrent;
+
+		psFinder = psList->psFirst;
+
+		if (psFinder == psList->psCurrent)
+		{
+			psList->psFirst = psTemp;
+		}
+		else
+		{
+			while (psFinder->psNext != psList->psCurrent)
+			{
+				psFinder = psFinder->psNext;
+			}
+
+			psFinder->psNext = psTemp;
+		}
+
+		psList->psCurrent = psTemp;
 }
