@@ -515,6 +515,8 @@ void *lstDeleteCurrent (ListPtr psList, void *pBuffer, int size)
 		psList->psCurrent = psTemp;
 	}
 
+	psList->numElements--;
+
 	return pBuffer;
 }
 
@@ -569,5 +571,6 @@ void lstInsertBefore (ListPtr psList, const void *pBuffer, int size)
 			psFinder->psNext = psTemp;
 		}
 
+		psList->numElements++;
 		psList->psCurrent = psTemp;
 }

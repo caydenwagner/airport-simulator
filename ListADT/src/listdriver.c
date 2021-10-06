@@ -72,9 +72,9 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
 
  Returned:	 	none
  *************************************************************************/
-static void printIntList (List sTheList)
+static void printCharList (List sTheList)
 {
-	int i, theIntData;
+	char i, theIntData;
 
 	if (!lstIsEmpty (&sTheList))
 	{
@@ -82,9 +82,9 @@ static void printIntList (List sTheList)
 		lstFirst (&sTheList);
 		for (i = 0; i < lstSize (&sTheList); ++i)
 		{
-			lstPeek(&sTheList,  &theIntData, sizeof (int));
+			lstPeek(&sTheList,  &theIntData, sizeof (char));
 			lstNext (&sTheList);
-			printf ("%d ", theIntData);
+			printf ("%c ", theIntData);
 		}
 		printf ("\n");
 	}
@@ -114,39 +114,19 @@ void insertAndValidManyTypes(ListPtr psTheList)
 	// long long
 	long long maxLongLong = LLONG_MAX;
 
-	lstInsertAfter(psTheList, &maxInt, sizeof(int));
-	lstInsertAfter(psTheList, &maxChar, sizeof(char));
-	lstInsertAfter(psTheList, &maxDouble, sizeof(double));
-	lstInsertAfter(psTheList, &maxFloat, sizeof(float));
-	lstInsertAfter(psTheList, &bTrue, sizeof(bool));
-	lstInsertAfter(psTheList, &maxShort, sizeof(short));
-	lstInsertAfter(psTheList, &maxLongLong, sizeof(long long));
+	lstInsertBefore(psTheList, &maxInt, sizeof(int));
+	lstInsertBefore(psTheList, &maxChar, sizeof(char));
+	lstInsertBefore(psTheList, &maxDouble, sizeof(double));
+	lstInsertBefore(psTheList, &maxFloat, sizeof(float));
+	lstInsertBefore(psTheList, &bTrue, sizeof(bool));
+	lstInsertBefore(psTheList, &maxShort, sizeof(short));
+	lstInsertBefore(psTheList, &maxLongLong, sizeof(long long));
 
 	lstFirst(psTheList);
 
-	maxInt = 0;
-	lstPeek(psTheList, &maxInt, sizeof(int));
-	assert(INT_MAX == maxInt, "Max int correct", "Max int incorrect");
-	lstNext(psTheList);
-
-	maxChar = 0;
-	lstPeek(psTheList, &maxChar, sizeof(char));
-	assert(CHAR_MAX == maxChar, "Max char correct", "Max char incorrect");
-	lstNext(psTheList);
-
-	maxDouble = 0.0;
-	lstPeek(psTheList, &maxDouble, sizeof(double));
-	assert(DBL_MAX == maxDouble, "Max double correct", "Max double incorrect");
-	lstNext(psTheList);
-
-	maxFloat = 0.0;
-	lstPeek(psTheList, &maxFloat, sizeof(float));
-	assert(FLT_MAX == maxFloat, "Max float correct", "Max float incorrect");
-	lstNext(psTheList);
-
-	bTrue = false;
-	lstPeek(psTheList, &bTrue, sizeof(bool));
-	assert(true == bTrue, "Max TRUE correct", "Max TRUE incorrect");
+	maxLongLong = 0;
+	lstPeek(psTheList, &maxLongLong, sizeof(long long));
+	assert(LLONG_MAX == maxLongLong, "Max long long correct", "Max long long incorrect");
 	lstNext(psTheList);
 
 	maxShort = 0;
@@ -154,30 +134,32 @@ void insertAndValidManyTypes(ListPtr psTheList)
 	assert(SHRT_MAX == maxShort, "Max short correct", "Max short incorrect");
 	lstNext(psTheList);
 
-	maxLongLong = 0;
-	lstPeek(psTheList, &maxLongLong, sizeof(long long));
-	assert(LLONG_MAX == maxLongLong, "Max long long correct", "Max long long incorrect");
+	bTrue = false;
+	lstPeek(psTheList, &bTrue, sizeof(bool));
+	assert(true == bTrue, "Max TRUE correct", "Max TRUE incorrect");
 	lstNext(psTheList);
-}
 
-void makeBigList(ListPtr psList, int max)
-{
-	int i;
+	maxFloat = 0.0;
+	lstPeek(psTheList, &maxFloat, sizeof(float));
+	assert(FLT_MAX == maxFloat, "Max float correct", "Max float incorrect");
+	lstNext(psTheList);
 
-	// insert max nodes
-	for (i = 0; i < max; ++i)
-	{
-		lstInsertAfter (psList, &i, sizeof (int));
-	}
+	maxDouble = 0.0;
+	lstPeek(psTheList, &maxDouble, sizeof(double));
+	assert(DBL_MAX == maxDouble, "Max double correct", "Max double incorrect");
+	lstNext(psTheList);
 
-	assert( max == lstSize (psList), "The list size is max",
-			"The list size is not max");
+	maxChar = 0;
+	lstPeek(psTheList, &maxChar, sizeof(char));
+	assert(CHAR_MAX == maxChar, "Max char correct", "Max char incorrect");
+	lstNext(psTheList);
 
-	assert( !lstIsEmpty (psList), "The list is NOT empty",
-			"The list is empty");
 
-	// For debugging purposes only
-	// printIntList (sTheList);
+	maxInt = 0;
+	lstPeek(psTheList, &maxInt, sizeof(int));
+	assert(INT_MAX == maxInt, "Max int correct", "Max int incorrect");
+	lstNext(psTheList);
+
 
 }
 
@@ -193,12 +175,6 @@ void makeBigList(ListPtr psList, int max)
 int main ()
 {
 	List sTheList;
-	List sTheSecondList;
-	const int BIG_LIST_SIZE = 1000000;
-	int i, intValue, secondIntValue;
-	int numValues;
-	char charValue;
-	char *szLetters="ABCDEFGHIJ";
 	char letter, storedLetter;
 
 	puts ("Driver Start");
@@ -208,92 +184,9 @@ int main ()
 	lstCreate (&sTheList);
 	success ("List Created");
 
-
-	// insert the ints 0 to 9
-	numValues = 10;
-	for (i = 0; i < numValues; ++i)
-	{
-		lstInsertAfter (&sTheList, &i, sizeof (int));
-	}
-
-
-	// insert a character between each int
-	lstFirst(&sTheList);
-	for (i = 0; i < numValues; ++i)
-	{
-		lstInsertAfter (&sTheList, &(szLetters[i]) , sizeof (char));
-		lstNext(&sTheList);
-	}
-
-	// validate the list
-	lstFirst(&sTheList);
-	for (i = 0; i < numValues; ++i)
-	{
-		lstPeek (&sTheList, &(intValue) , sizeof (int));
-
-		lstNext(&sTheList);
-
-		lstPeek(&sTheList, &charValue , sizeof(char));
-
-		lstNext(&sTheList);
-
-		assert(intValue == i && charValue == szLetters[i], "Valid Data",
-				"Invalid Data");
-	}
-
-	lstTerminate(&sTheList);
-
-	lstCreate(&sTheList);
-	lstCreate(&sTheSecondList);
-
-	makeBigList(&sTheList, BIG_LIST_SIZE);
-	makeBigList(&sTheSecondList, BIG_LIST_SIZE);
-
-	// walk through both lists and validate!
-
-	lstFirst(&sTheList);
-	lstFirst(&sTheSecondList);
-
-	i = lstSize(&sTheList);
-
-	while( i > 0)
-	{
-
-		lstPeek(&sTheList, &intValue, sizeof(int));
-		lstPeek(&sTheSecondList, &secondIntValue, sizeof(int));
-
-		if( intValue != secondIntValue )
-		{
-			assert(intValue == secondIntValue, "Big lists match", "Big lists do not match");
-		}
-
-		lstNext(&sTheList);
-		lstNext(&sTheSecondList);
-
-		--i;
-	}
-
-	lstTerminate (&sTheList);
-	success ("List Terminated");
-
-	lstTerminate (&sTheSecondList);
-	success ("Second List Terminated");
-
-	lstCreate (&sTheList);
-	success ("List Created");
-
-	insertAndValidManyTypes(&sTheList);
-
-	lstTerminate (&sTheList);
-	success ("List Terminated");
-
-	lstCreate (&sTheList);
-	success ("List Created");
-
-
 	for (letter = 'A'; letter <= 'Z'; ++letter)
 	{
-		lstInsertAfter (&sTheList, &letter, sizeof (char));
+		lstInsertBefore (&sTheList, &letter, sizeof (char));
 		lstPeek(&sTheList, &storedLetter, sizeof(char));
 		if(  letter != storedLetter)
 		{
@@ -302,11 +195,9 @@ int main ()
 		}
 	}
 
-	lstNext (&sTheList);
-	lstInsertAfter (&sTheList, &intValue, sizeof (int));
+	printCharList (sTheList);
 
-	lstTerminate (&sTheList);
-	success ("List Terminated");
+	lstTerminate(&sTheList);
 
 	puts ("Driver End");
 	return EXIT_SUCCESS;
