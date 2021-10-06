@@ -319,7 +319,7 @@ bool lstHasCurrent (const ListPtr psList)
 		processError("lstHasCurrent", ERROR_INVALID_LIST);
 	}
 
-	return ( NULL == psList->psCurrent );
+	return ( NULL != psList->psCurrent );
 }
 
 /**************************************************************************
@@ -402,7 +402,7 @@ void lstLast (ListPtr psList)
 	{
 		processError("lstLast", ERROR_INVALID_LIST);
 	}
-	if ( psList->numElements == 0 )
+	if ( psList->numElements == 0)
 	{
 		processError("lstLast", ERROR_EMPTY_LIST);
 	}
@@ -423,8 +423,7 @@ void lstLast (ListPtr psList)
  Returned:			None
  *************************************************************************/
 
-void lstUpdateCurrent (ListPtr psList, const void *pBuffer,
-											 int size)
+void lstUpdateCurrent (ListPtr psList, const void *pBuffer, int size)
 {
 	if ( psList == NULL )
 	{
@@ -443,10 +442,12 @@ void lstUpdateCurrent (ListPtr psList, const void *pBuffer,
 		processError("lstUpdateCurrent", ERROR_NO_CURRENT);
 	}
 
-	free(psList->psCurrent->pData);
-	psList->psCurrent->pData = malloc(size);
 
-	memcpy(psList->psCurrent, pBuffer, size);
+
+	free(psList->psCurrent->pData);
+	psList->psCurrent->pData = malloc(sizeof(size));
+
+	memcpy(psList->psCurrent->pData, pBuffer, size);
 }
 
 /**************************************************************************
@@ -486,7 +487,7 @@ void *lstDeleteCurrent (ListPtr psList, void *pBuffer, int size)
 
 	psTemp = psList->psFirst;
 
-	memcpy(psList->psCurrent->pData, pBuffer, size);
+
 
 	if (psTemp == psList->psCurrent)
 	{
@@ -507,12 +508,23 @@ void *lstDeleteCurrent (ListPtr psList, void *pBuffer, int size)
 		if (psList->psCurrent->psNext != NULL)
 		{
 			psTemp->psNext = psList->psCurrent->psNext;
+
+			free(psList->psCurrent->pData);
+			free(psList->psCurrent);
+
+			psList->psCurrent = psTemp;
+		}
+		else
+		{
+			psTemp->psNext = psList->psCurrent->psNext;
+
+			free(psList->psCurrent->pData);
+			free(psList->psCurrent);
+
+			psList->psCurrent = psTemp;
+			psList->psLast = psTemp;
 		}
 
-		free(psList->psCurrent->pData);
-		free(psList->psCurrent);
-
-		psList->psCurrent = psTemp;
 	}
 
 	psList->numElements--;
@@ -557,7 +569,12 @@ void lstInsertBefore (ListPtr psList, const void *pBuffer, int size)
 
 		psFinder = psList->psFirst;
 
-		if (psFinder == psList->psCurrent)
+		if(psList->numElements == 0)
+		{
+			psList->psLast = psTemp;
+			psList->psFirst = psTemp;
+		}
+		else if (psFinder == psList->psCurrent)
 		{
 			psList->psFirst = psTemp;
 		}
