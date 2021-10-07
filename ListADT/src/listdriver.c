@@ -1,10 +1,10 @@
 /**************************************************************************
  File name:  listdriver.c
  Author:     Computer Science, Pacific University
- Date:		 October 6 2021
- Class:		 CS300
+ Date:			 October 6 2021
+ Class:			 CS300
  Assignment: ListADT part 2
- Purpose:	 Create a fully function linked list abstract data type
+ Purpose:	 	 Create a fully function linked list abstract data type
  *************************************************************************/
 
 #include <stdio.h>
