@@ -62,7 +62,7 @@ static void processError (const char *pszFunctionName, int errorCode)
 
 void lstCreate (ListPtr psList)
 {
-	if ( NULL == psList )
+	if (NULL == psList)
 	{
 		processError("lstCreate", ERROR_NO_LIST_CREATE);
 	}
@@ -89,16 +89,16 @@ void lstCreate (ListPtr psList)
 
 void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
 {
-	if ( NULL == psList )
+	if (NULL == psList)
 	{
 		processError("lstInsertAfter", ERROR_INVALID_LIST);
 	}
 
-	if ( NULL == pBuffer )
+	if (NULL == pBuffer)
 	{
 		processError("lstInsertAfter", ERROR_NULL_PTR);
 	}
-	if (NULL == psList->psCurrent && psList->numElements != 0 )
+	if (NULL == psList->psCurrent && psList->numElements != 0)
 	{
 		processError("lstInsertAfter", ERROR_NO_CURRENT);
 	}
@@ -142,12 +142,12 @@ void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
  	 	 	 	 	 	 	 	 	 	 	 	 	 of the element pointed to by psCurrent
  	 	 	 	 	 	 	 	size    -	 the size of the data pointed to by psCurrent
 
- Returned:			The data contained in the current node
+ Returned:			A pointer to the data contained in the current node
  *************************************************************************/
 
 void *lstPeek (const ListPtr psList, void *pBuffer, int size)
 {
-	if ( psList == NULL )
+	if (psList == NULL)
 	{
 		processError("lstPeek", ERROR_INVALID_LIST);
 	}
@@ -182,7 +182,7 @@ void *lstPeek (const ListPtr psList, void *pBuffer, int size)
 
 void lstTerminate (ListPtr psList)
 {
-	if (NULL == psList )
+	if (NULL == psList)
 	{
 		processError("lstTerminate", ERROR_NO_LIST_TERMINATE);
 	}
@@ -241,7 +241,7 @@ int lstSize (const ListPtr psList)
 
 bool lstIsEmpty (const ListPtr psList)
 {
-	if ( NULL == psList)
+	if (NULL == psList)
 	{
 		processError("lstSize", ERROR_INVALID_LIST);
 	}
@@ -261,11 +261,11 @@ bool lstIsEmpty (const ListPtr psList)
 
 void lstFirst (ListPtr psList)
 {
-	if ( NULL == psList)
+	if (NULL == psList)
 	{
 		processError("lstFirst", ERROR_INVALID_LIST);
 	}
-	if ( psList->numElements == 0 )
+	if (psList->numElements == 0)
 	{
 		processError("lstFirst", ERROR_EMPTY_LIST);
 	}
@@ -285,15 +285,15 @@ void lstFirst (ListPtr psList)
 
 void lstNext (ListPtr psList)
 {
-	if ( NULL == psList)
+	if (NULL == psList)
 	{
 		processError("lstNext", ERROR_INVALID_LIST);
 	}
-	if ( psList->numElements == 0 )
+	if (psList->numElements == 0)
 	{
 		processError("lstNext", ERROR_EMPTY_LIST);
 	}
-	if ( psList->psCurrent == NULL )
+	if (psList->psCurrent == NULL)
 	{
 		processError("lstNext", ERROR_NO_CURRENT);
 	}
@@ -314,12 +314,12 @@ void lstNext (ListPtr psList)
 
 bool lstHasCurrent (const ListPtr psList)
 {
-	if ( NULL == psList)
+	if (NULL == psList)
 	{
 		processError("lstHasCurrent", ERROR_INVALID_LIST);
 	}
 
-	return ( NULL != psList->psCurrent );
+	return (NULL != psList->psCurrent);
 }
 
 /**************************************************************************
@@ -336,12 +336,12 @@ bool lstHasCurrent (const ListPtr psList)
 
 bool lstHasNext (const ListPtr psList)
 {
-	if ( NULL == psList)
+	if (NULL == psList)
 	{
 		processError("lstHasNext", ERROR_INVALID_LIST);
 	}
 
-		return ( NULL == psList->psCurrent->psNext );
+		return (NULL == psList->psCurrent->psNext);
 }
 
 /**************************************************************************
@@ -360,15 +360,15 @@ bool lstHasNext (const ListPtr psList)
 
 void *lstPeekNext (const ListPtr psList, void *pBuffer, int size)
 {
-	if ( psList == NULL )
+	if (psList == NULL)
 	{
 		processError("lstPeekNext", ERROR_INVALID_LIST);
 	}
-	if ( pBuffer == NULL )
+	if (pBuffer == NULL)
 	{
 		processError("lstPeekNext", ERROR_NULL_PTR);
 	}
-	if ( psList->numElements == 0)
+	if (psList->numElements == 0)
 	{
 		processError("lstPeekNext", ERROR_EMPTY_LIST);
 	}
@@ -398,11 +398,11 @@ void *lstPeekNext (const ListPtr psList, void *pBuffer, int size)
 
 void lstLast (ListPtr psList)
 {
-	if ( NULL == psList)
+	if (NULL == psList)
 	{
 		processError("lstLast", ERROR_INVALID_LIST);
 	}
-	if ( psList->numElements == 0)
+	if (psList->numElements == 0)
 	{
 		processError("lstLast", ERROR_EMPTY_LIST);
 	}
@@ -425,15 +425,15 @@ void lstLast (ListPtr psList)
 
 void lstUpdateCurrent (ListPtr psList, const void *pBuffer, int size)
 {
-	if ( psList == NULL )
+	if (psList == NULL)
 	{
 		processError("lstUpdateCurrent", ERROR_INVALID_LIST);
 	}
-	if ( pBuffer == NULL )
+	if (pBuffer == NULL)
 	{
 		processError("lstUpdateCurrent", ERROR_NULL_PTR);
 	}
-	if ( psList->numElements == 0)
+	if (psList->numElements == 0)
 	{
 		processError("lstUpdateCurrent", ERROR_EMPTY_LIST);
 	}
@@ -441,8 +441,6 @@ void lstUpdateCurrent (ListPtr psList, const void *pBuffer, int size)
 	{
 		processError("lstUpdateCurrent", ERROR_NO_CURRENT);
 	}
-
-
 
 	free(psList->psCurrent->pData);
 	psList->psCurrent->pData = malloc(sizeof(size));
@@ -466,15 +464,15 @@ void lstUpdateCurrent (ListPtr psList, const void *pBuffer, int size)
 
 void *lstDeleteCurrent (ListPtr psList, void *pBuffer, int size)
 {
-	if ( psList == NULL )
+	if (psList == NULL)
 	{
 		processError("lstDeleteCurrent", ERROR_INVALID_LIST);
 	}
-	if ( pBuffer == NULL )
+	if (pBuffer == NULL)
 	{
 		processError("lstDeleteCurrent", ERROR_NULL_PTR);
 	}
-	if ( psList->numElements == 0)
+	if (psList->numElements == 0)
 	{
 		processError("lstDeleteCurrent", ERROR_EMPTY_LIST);
 	}
@@ -486,8 +484,6 @@ void *lstDeleteCurrent (ListPtr psList, void *pBuffer, int size)
 	ListElementPtr psTemp;
 
 	psTemp = psList->psFirst;
-
-
 
 	if (psTemp == psList->psCurrent)
 	{
@@ -548,11 +544,11 @@ void *lstDeleteCurrent (ListPtr psList, void *pBuffer, int size)
 
 void lstInsertBefore (ListPtr psList, const void *pBuffer, int size)
 {
-	if ( NULL == psList )
+	if (NULL == psList)
 	{
 		processError("lstInsertBefore", ERROR_INVALID_LIST);
 	}
-	if ( NULL == pBuffer )
+	if (NULL == pBuffer)
 	{
 		processError("lstInsertBeforer", ERROR_NULL_PTR);
 	}
