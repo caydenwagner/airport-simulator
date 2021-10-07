@@ -196,6 +196,7 @@ int main ()
 	List sTheList;
 	char letter, storedLetter;
 	char letterA = 'A', letterB = 'B', letterC = 'C';
+	char maxChar = CHAR_MAX;
 
 	long long maxLongLong;
 
@@ -257,8 +258,18 @@ int main ()
 
 	maxLongLong = 0;
 	lstPeekNext(&sTheList, &maxLongLong, sizeof(long long));
-	assert(LLONG_MAX == maxLongLong, "Max long long correct, LstPeekNext"
-				" is valid", "Max long long incorrect, LstPeekNxt is invalid");
+	assert(LLONG_MAX == maxLongLong, "Max long long correct, lstPeekNext"
+																" is valid", "Max long long incorrect");
+
+	lstFirst(&sTheList);
+
+	lstUpdateCurrent(&sTheList, &maxChar, sizeof(char));
+
+	maxChar = 0;
+
+	lstPeek(&sTheList, &maxChar, sizeof(char));
+	assert(CHAR_MAX == maxChar, "Max char correct, lstUpdateCurrent is valid"
+														, "Max char incorrect");
 	lstNext(&sTheList);
 
 	lstTerminate(&sTheList);
