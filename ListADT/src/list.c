@@ -14,7 +14,6 @@
 
 char gszListErrors[NUMBER_OF_LIST_ERRORS][MAX_ERROR_LIST_CHARS];
 
-
 /**************************************************************************
  Function: 	 		lstLoadErrorMessages
 
