@@ -341,7 +341,14 @@ bool lstHasNext (const ListPtr psList)
 		processError("lstHasNext", ERROR_INVALID_LIST);
 	}
 
-		return (NULL == psList->psCurrent->psNext);
+	bool bHasNext = true;
+
+	if (NULL == psList->psCurrent->psNext)
+	{
+		bHasNext = false;
+	}
+
+		return bHasNext;
 }
 
 /**************************************************************************
@@ -482,6 +489,7 @@ void *lstDeleteCurrent (ListPtr psList, void *pBuffer, int size)
 	}
 
 	ListElementPtr psTemp;
+	memcpy(pBuffer, psList->psCurrent->pData, size);
 
 	psTemp = psList->psFirst;
 
