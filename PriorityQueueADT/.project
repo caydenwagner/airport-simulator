@@ -3,6 +3,7 @@
 	<name>PriorityQueueADT</name>
 	<comment></comment>
 	<projects>
+		<project>ListADT</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -151,7 +151,8 @@ void insertAndValidManyTypes(ListPtr psTheList)
 
 	maxLongLong = 0;
 	lstPeek(psTheList, &maxLongLong, sizeof(long long));
-	assert(LLONG_MAX == maxLongLong, "Max long long correct", "Max long long incorrect");
+	assert(LLONG_MAX == maxLongLong, "Max long long correct",
+																	 "Max long long incorrect");
 	lstNext(psTheList);
 
 	bTrue = false;
