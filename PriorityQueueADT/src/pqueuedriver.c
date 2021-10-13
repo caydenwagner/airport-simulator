@@ -87,6 +87,11 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
 int main ()
 {
 	PriorityQueue sTheQueue;
+
+	pqueueLoadErrorMessages();
+
+	pqueueCreate(&sTheQueue);
+
 	assert(1 == 1, "true", "false");
 	printf("Hello World!");
 

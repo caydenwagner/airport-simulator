@@ -14,6 +14,20 @@
 
 char gszPQErrors[NUMBER_OF_LIST_ERRORS][MAX_ERROR_LIST_CHARS];
 /**************************************************************************
+ Function: 	 		pqLoadErrorMessages
+
+ Description: 	Initializes the string of error messages. LOAD_ERRORS is a
+ 	 	 	 					macro defined in the header file.
+
+ Parameters:		None
+
+ Returned:	 		None
+ *************************************************************************/
+void pqueueLoadErrorMessages ()
+{
+	LOAD_PQ_ERRORS
+}
+/**************************************************************************
  Function: 	 		processError
 
  Description:   Process the error code passed to this routine
