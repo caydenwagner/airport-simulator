@@ -14,7 +14,6 @@
 #include "../include/pqueue.h"
 #include <limits.h>
 #include <float.h>
-
 /**************************************************************************
  Function: 	 	success
 
@@ -24,12 +23,10 @@
 
  Returned:	 	none
  *************************************************************************/
-
 static void success (char * szStr)
 {
 	printf ("SUCCESS: %s\n", szStr);
 }
-
 /**************************************************************************
  Function: 	 	failure
 
@@ -39,13 +36,11 @@ static void success (char * szStr)
 
  Returned:	 	none
  *************************************************************************/
-
 static void failure (char * szStr)
 {
 	printf ("FAILURE: %s\n", szStr);
 	exit (EXIT_FAILURE);
 }
-
 /****************************************************************************
  Function: 	 	assert
 
@@ -61,7 +56,6 @@ static void failure (char * szStr)
 
  Returned:	 	none
  ****************************************************************************/
-
 static void assert (bool bExpression, char *pTrue, char *pFalse)
 {
 	if (bExpression)
@@ -73,7 +67,6 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
 		failure (pFalse);
 	}
 }
-
 /****************************************************************************
  Function:
 
@@ -83,7 +76,6 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
 
  Returned:
  ****************************************************************************/
-
 int main ()
 {
 	PriorityQueue sTheQueue;
@@ -92,7 +84,12 @@ int main ()
 
 	pqueueCreate(&sTheQueue);
 
-	assert(1 == 1, "true", "false");
+	assert(0 == pqueueSize(&sTheQueue), "The list is empty",
+																		"The list is not empty");
+
+	assert(pqueueIsEmpty(&sTheQueue), "The list is empty",
+																	"The list is not empty");
+
 	printf("Hello World!");
 
 	return 0;

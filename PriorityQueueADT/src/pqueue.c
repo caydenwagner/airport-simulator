@@ -61,3 +61,37 @@ void pqueueCreate (PriorityQueuePtr psQueue)
 	}
 	lstCreate(&(psQueue->sTheList));
 }
+/**************************************************************************
+ Function:			pqueueSize
+
+ Description:		Returns the number of elements in the queue
+
+ Parameters:		psQueue - a pointer to the queue
+
+ Returned:			The number of elements in the queue
+ *************************************************************************/
+int pqueueSize (const PriorityQueuePtr psQueue)
+{
+	if (NULL == psQueue)
+	{
+		processError("pqueueSize", ERROR_INVALID_PQ);
+	}
+	return psQueue->sTheList.numElements;
+}
+/**************************************************************************
+ Function:			pqueueIsEmpty
+
+ Description:		Determines if the queue contains any elements or not
+
+ Parameters:		psQueue - a pointer to the queue
+
+ Returned:			True if the list contains 0 elements, else false
+ *************************************************************************/
+bool pqueueIsEmpty (const PriorityQueuePtr psQueue)
+{
+	if (NULL == psQueue)
+	{
+		processError("pqueueIsEmpty", ERROR_INVALID_PQ);
+	}
+	return (0 == psQueue->sTheList.numElements);
+}
