@@ -117,12 +117,12 @@ void pqueueEnqueue (PriorityQueuePtr psQueue, const void *pBuffer,
 	}
 
 	PriorityQueueElementPtr psTemp;
-	PriorityQueueElement sTempCurrent, sTempLast;
+	PriorityQueueElement sTempCurrent;
 
 	psTemp = malloc(sizeof(PriorityQueueElementPtr));
 	psTemp->pData = malloc(sizeof(size));
 
-	psTemp->priority = priority;
+	memcpy(&(psTemp->priority), &priority, sizeof(int));
 	memcpy(psTemp->pData, pBuffer, sizeof(size));
 
 	if (pqueueIsEmpty(psQueue))
@@ -135,12 +135,8 @@ void pqueueEnqueue (PriorityQueuePtr psQueue, const void *pBuffer,
 		lstPeek(&(psQueue->sTheList), &sTempCurrent,
 						sizeof(PriorityQueueElementPtr));
 
-		lstLast(&(psQueue->sTheList));
-		lstPeek(&(psQueue->sTheList), &sTempLast,
-					  sizeof(PriorityQueueElementPtr));
-
 		while (priority < sTempCurrent.priority &&
-					&sTempCurrent != &sTempLast)
+					lstHasNext(&(psQueue->sTheList)))
 		{
 			lstNext(&(psQueue->sTheList));
 			lstPeek(&(psQueue->sTheList), &sTempCurrent,
@@ -155,4 +151,38 @@ void pqueueEnqueue (PriorityQueuePtr psQueue, const void *pBuffer,
 			lstInsertBefore(&(psQueue->sTheList), psTemp, sizeof(PriorityQueueElementPtr));
 		}
 	}
+}
+/**************************************************************************
+ Function:
+
+ Description:
+
+ Parameters:		psQueue - a pointer to the queue
+
+ Returned:
+ *************************************************************************/
+void *pqueuePeek (PriorityQueuePtr psQueue, void *pBuffer, int size,
+								 int *priority)
+{
+	if (NULL == psQueue)
+	{
+		processError("pqueuePeek", ERROR_INVALID_PQ);
+	}
+	if (NULL == pBuffer)
+	{
+		processError("pqueuePeek", ERROR_NULL_PQ_PTR);
+	}
+	if (lstIsEmpty(&psQueue->sTheList))
+	{
+		processError("pqueuePeek", ERROR_EMPTY_PQ);
+	}
+
+	PriorityQueueElement sTemp;
+
+	lstPeek(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElementPtr));
+
+	memcpy(pBuffer, sTemp.pData, size);
+	memcpy(priority, &(sTemp.priority), sizeof(int));
+
+	return pBuffer;
 }

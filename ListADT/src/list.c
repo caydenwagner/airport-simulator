@@ -242,7 +242,7 @@ bool lstIsEmpty (const ListPtr psList)
 {
 	if (NULL == psList)
 	{
-		processError("lstSize", ERROR_INVALID_LIST);
+		processError("lstIsEmpty", ERROR_INVALID_LIST);
 	}
 
 	return (psList->numElements == 0);
@@ -347,7 +347,7 @@ bool lstHasNext (const ListPtr psList)
 		bHasNext = false;
 	}
 
-		return bHasNext;
+	return bHasNext;
 }
 
 /**************************************************************************

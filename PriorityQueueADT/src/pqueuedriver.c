@@ -80,6 +80,8 @@ int main ()
 {
 	PriorityQueue sTheQueue;
 	char data = 'L';
+	char pBuf;
+	int pPriBuf;
 
 	pqueueLoadErrorMessages();
 
@@ -91,9 +93,18 @@ int main ()
 	assert(pqueueIsEmpty(&sTheQueue), "The list is empty",
 																	"The list is not empty");
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 9;  i > 0; i--)
 	{
 		pqueueEnqueue(&sTheQueue, &data, sizeof(char), i);
+	}
+
+	lstFirst(&(sTheQueue.sTheList));
+
+	for (int i = 0; i < 9; i++)
+	{
+		pqueuePeek(&sTheQueue, &pBuf, sizeof(char), &pPriBuf);
+		printf("%d. Data: %c , Priority: %d\n\n", i, pBuf, pPriBuf);
+		lstNext(&sTheQueue.sTheList);
 	}
 
 	printf("Hello World! Yes");
