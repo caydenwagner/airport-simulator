@@ -79,6 +79,7 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
 int main ()
 {
 	PriorityQueue sTheQueue;
+	char data = 'L';
 
 	pqueueLoadErrorMessages();
 
@@ -90,7 +91,12 @@ int main ()
 	assert(pqueueIsEmpty(&sTheQueue), "The list is empty",
 																	"The list is not empty");
 
-	printf("Hello World!");
+	for (int i = 0; i < 9; i++)
+	{
+		pqueueEnqueue(&sTheQueue, &data, sizeof(char), i);
+	}
+
+	printf("Hello World! Yes");
 
 	return 0;
 }

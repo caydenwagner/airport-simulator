@@ -95,3 +95,64 @@ bool pqueueIsEmpty (const PriorityQueuePtr psQueue)
 	}
 	return (0 == psQueue->sTheList.numElements);
 }
+/**************************************************************************
+ Function:
+
+ Description:
+
+ Parameters:		psQueue - a pointer to the queue
+
+ Returned:
+ *************************************************************************/
+void pqueueEnqueue (PriorityQueuePtr psQueue, const void *pBuffer,
+										int size, int priority)
+{
+	if (NULL == psQueue)
+	{
+		processError("pqueueEnqueue", ERROR_INVALID_PQ);
+	}
+	if (NULL == pBuffer)
+	{
+		processError("pqueueEnqueue", ERROR_NULL_PQ_PTR);
+	}
+
+	PriorityQueueElementPtr psTemp;
+	PriorityQueueElement sTempCurrent, sTempLast;
+
+	psTemp = malloc(sizeof(PriorityQueueElementPtr));
+	psTemp->pData = malloc(sizeof(size));
+
+	psTemp->priority = priority;
+	memcpy(psTemp->pData, pBuffer, sizeof(size));
+
+	if (pqueueIsEmpty(psQueue))
+	{
+		lstInsertAfter(&(psQueue->sTheList), psTemp, sizeof(PriorityQueueElementPtr));
+	}
+	else
+	{
+		lstFirst(&(psQueue->sTheList));
+		lstPeek(&(psQueue->sTheList), &sTempCurrent,
+						sizeof(PriorityQueueElementPtr));
+
+		lstLast(&(psQueue->sTheList));
+		lstPeek(&(psQueue->sTheList), &sTempLast,
+					  sizeof(PriorityQueueElementPtr));
+
+		while (priority < sTempCurrent.priority &&
+					&sTempCurrent != &sTempLast)
+		{
+			lstNext(&(psQueue->sTheList));
+			lstPeek(&(psQueue->sTheList), &sTempCurrent,
+							sizeof(PriorityQueueElementPtr));
+		}
+		if (priority < sTempCurrent.priority)
+		{
+			lstInsertAfter(&(psQueue->sTheList), psTemp, sizeof(PriorityQueueElementPtr));
+		}
+		else
+		{
+			lstInsertBefore(&(psQueue->sTheList), psTemp, sizeof(PriorityQueueElementPtr));
+		}
+	}
+}
