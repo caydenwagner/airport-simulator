@@ -79,8 +79,8 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
 int main ()
 {
 	PriorityQueue sTheQueue;
-	int data = 8;
-	char pBuf;
+	int data = 0;
+	int pBuf;
 	int pPriBuf;
 
 	pqueueLoadErrorMessages();
@@ -92,26 +92,48 @@ int main ()
 
 	assert(pqueueIsEmpty(&sTheQueue), "The list is empty",
 																	"The list is not empty");
-
-	for (int i = 9;  i > 0; i--)
+	for (int i = 0; i < 10; i++)
 	{
 		pqueueEnqueue(&sTheQueue, &data, sizeof(int), i);
+		data++;
 	}
-
-	lstFirst(&(sTheQueue.sTheList));
-
-	for (int i = 0; i < 10; i+=2)
+	for (int i = 10; i > -4; i--)
 	{
 		pqueueEnqueue(&sTheQueue, &data, sizeof(int), i);
+		data++;
 	}
+
+	lstFirst(&sTheQueue.sTheList);
+	for (int i = 0; i < pqueueSize(&sTheQueue); i++)
+	{
+		pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+		lstNext(&sTheQueue.sTheList);
+		printf("%d. Data: %d , Priority: %d\n\n", i, pBuf, pPriBuf);
+	}
+
+	pqueueDequeue(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+
+	lstFirst(&sTheQueue.sTheList);
+	for (int i = 0; i < pqueueSize(&sTheQueue); i++)
+	{
+		pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+		lstNext(&sTheQueue.sTheList);
+		printf("%d. Data: %d , Priority: %d\n\n", i, pBuf, pPriBuf);
+	}
+
+	pqueueChangePriority(&sTheQueue, 10);
+
+	lstFirst(&sTheQueue.sTheList);
 
 	for (int i = 0; i < pqueueSize(&sTheQueue); i++)
 	{
-		pqueuePeek(&sTheQueue, &pBuf, sizeof(char), &pPriBuf);
-		printf("%d. Data: %c , Priority: %d\n\n", i, pBuf, pPriBuf);
+		pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+		lstNext(&sTheQueue.sTheList);
+		printf("%d. Data: %d , Priority: %d\n\n", i, pBuf, pPriBuf);
 	}
 
 	printf("Hello World! Yes");
+	pqueueTerminate(&sTheQueue);
 
 	return 0;
 }

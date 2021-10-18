@@ -116,40 +116,37 @@ void pqueueEnqueue (PriorityQueuePtr psQueue, const void *pBuffer,
 		processError("pqueueEnqueue", ERROR_NULL_PQ_PTR);
 	}
 
-	PriorityQueueElementPtr psTemp;
-	PriorityQueueElement sTempCurrent;
+	PriorityQueueElement sTemp, sTempCurrent;
 
-	psTemp = (PriorityQueueElementPtr) malloc(sizeof(PriorityQueueElementPtr));
-	psTemp->pData =  malloc(size);
-	memcpy(psTemp->pData, pBuffer, size);
+	sTemp.pData = malloc(size);
 
-	memcpy(&(psTemp->priority), &priority, sizeof(int));
-	memcpy(psTemp->pData, pBuffer, size);
+	sTemp.priority = priority;
+	memcpy(sTemp.pData, pBuffer, size);
 
 	if (pqueueIsEmpty(psQueue))
 	{
-		lstInsertAfter(&(psQueue->sTheList), psTemp, sizeof(PriorityQueueElementPtr));
+		lstInsertAfter(&(psQueue->sTheList), &sTemp, sizeof(PriorityQueueElement));
 	}
 	else
 	{
 		lstFirst(&(psQueue->sTheList));
 		lstPeek(&(psQueue->sTheList), &sTempCurrent,
-						sizeof(PriorityQueueElementPtr));
+						sizeof(PriorityQueueElement));
 
-		while (priority < sTempCurrent.priority &&
+		while (priority > sTempCurrent.priority &&
 					lstHasNext(&(psQueue->sTheList)))
 		{
 			lstNext(&(psQueue->sTheList));
 			lstPeek(&(psQueue->sTheList), &sTempCurrent,
-							sizeof(PriorityQueueElementPtr));
+							sizeof(PriorityQueueElement));
 		}
-		if (priority < sTempCurrent.priority)
+		if (priority >= sTempCurrent.priority)
 		{
-			lstInsertAfter(&(psQueue->sTheList), psTemp, sizeof(PriorityQueueElementPtr));
+			lstInsertAfter(&(psQueue->sTheList), &sTemp, sizeof(PriorityQueueElement));
 		}
 		else
 		{
-			lstInsertBefore(&(psQueue->sTheList), psTemp, sizeof(PriorityQueueElementPtr));
+			lstInsertBefore(&(psQueue->sTheList), &sTemp, sizeof(PriorityQueueElement));
 		}
 	}
 }
@@ -180,11 +177,105 @@ void *pqueuePeek (PriorityQueuePtr psQueue, void *pBuffer, int size,
 
 	PriorityQueueElement sTemp;
 
-	lstFirst(&(psQueue->sTheList));
-	lstPeek(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElementPtr));
+	//lstFirst(&(psQueue->sTheList));
+	lstPeek(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElement));
 
-	memcpy(pBuffer, psQueue->sTheList.psFirst->pData, size);
-	memcpy(priority, &(sTemp.priority), sizeof(int));
+	memcpy(pBuffer, sTemp.pData, size);
+	*priority = sTemp.priority;
 
 	return pBuffer;
+}
+/**************************************************************************
+ Function:
+
+ Description:
+
+ Parameters:		psQueue - a pointer to the queue
+
+ Returned:
+ *************************************************************************/
+void *pqueueDequeue (PriorityQueuePtr psQueue, void *pBuffer,
+										 int size, int  *pPriority)
+{
+	if (NULL == psQueue)
+	{
+		processError("pqueueDequeue", ERROR_INVALID_PQ);
+	}
+	if (NULL == pBuffer)
+	{
+		processError("pqueueDequeue", ERROR_NULL_PQ_PTR);
+	}
+	if (pqueueIsEmpty(psQueue))
+	{
+		processError("pqueueDequeue", ERROR_EMPTY_PQ);
+	}
+	PriorityQueueElement sTemp;
+
+	lstFirst(&(psQueue->sTheList));
+	lstPeek(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElement));
+
+	memcpy(pBuffer, sTemp.pData, size);
+	*pPriority = sTemp.priority;
+
+	free(sTemp.pData);
+
+	lstDeleteCurrent(&psQueue->sTheList, &sTemp, size);
+
+	return pBuffer;
+}
+/**************************************************************************
+ Function:
+
+ Description:
+
+ Parameters:		psQueue - a pointer to the queue
+
+ Returned:
+ *************************************************************************/
+void pqueueTerminate (PriorityQueuePtr psQueue)
+{
+	if (NULL == psQueue)
+	{
+		processError("pqueueTerminate", ERROR_NO_PQ_TERMINATE);
+	}
+	PriorityQueueElement sTemp;
+
+	lstFirst(&psQueue->sTheList);
+
+		for (int i = 0; i < pqueueSize(psQueue); i++)
+		{
+			lstPeek(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElement));
+			free(sTemp.pData);
+			lstNext(&psQueue->sTheList);
+		}
+
+		lstTerminate(&psQueue->sTheList);
+}
+/**************************************************************************
+ Function:
+
+ Description:
+
+ Parameters:		psQueue - a pointer to the queue
+
+ Returned:
+ *************************************************************************/
+void pqueueChangePriority (PriorityQueuePtr psQueue,
+												   int change)
+{
+	if (NULL == psQueue)
+	{
+		processError("pqueueDequeue", ERROR_INVALID_PQ);
+	}
+	PriorityQueueElement sTemp;
+
+	lstFirst(&psQueue->sTheList);
+
+	for (int i = 0; i < pqueueSize(psQueue); i++)
+	{
+		lstPeek(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElement));
+		sTemp.priority = sTemp.priority + change;
+		lstUpdateCurrent(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElement));
+		lstNext(&psQueue->sTheList);
+	}
 }
