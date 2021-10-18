@@ -119,11 +119,12 @@ void pqueueEnqueue (PriorityQueuePtr psQueue, const void *pBuffer,
 	PriorityQueueElementPtr psTemp;
 	PriorityQueueElement sTempCurrent;
 
-	psTemp = malloc(sizeof(PriorityQueueElementPtr));
-	psTemp->pData = malloc(sizeof(size));
+	psTemp = (PriorityQueueElementPtr) malloc(sizeof(PriorityQueueElementPtr));
+	psTemp->pData =  malloc(size);
+	memcpy(psTemp->pData, pBuffer, size);
 
 	memcpy(&(psTemp->priority), &priority, sizeof(int));
-	memcpy(psTemp->pData, pBuffer, sizeof(size));
+	memcpy(psTemp->pData, pBuffer, size);
 
 	if (pqueueIsEmpty(psQueue))
 	{
@@ -179,9 +180,10 @@ void *pqueuePeek (PriorityQueuePtr psQueue, void *pBuffer, int size,
 
 	PriorityQueueElement sTemp;
 
+	lstFirst(&(psQueue->sTheList));
 	lstPeek(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElementPtr));
 
-	memcpy(pBuffer, sTemp.pData, size);
+	memcpy(pBuffer, psQueue->sTheList.psFirst->pData, size);
 	memcpy(priority, &(sTemp.priority), sizeof(int));
 
 	return pBuffer;

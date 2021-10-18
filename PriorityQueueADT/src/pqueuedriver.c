@@ -79,7 +79,7 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
 int main ()
 {
 	PriorityQueue sTheQueue;
-	char data = 'L';
+	int data = 8;
 	char pBuf;
 	int pPriBuf;
 
@@ -95,16 +95,20 @@ int main ()
 
 	for (int i = 9;  i > 0; i--)
 	{
-		pqueueEnqueue(&sTheQueue, &data, sizeof(char), i);
+		pqueueEnqueue(&sTheQueue, &data, sizeof(int), i);
 	}
 
 	lstFirst(&(sTheQueue.sTheList));
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 10; i+=2)
+	{
+		pqueueEnqueue(&sTheQueue, &data, sizeof(int), i);
+	}
+
+	for (int i = 0; i < pqueueSize(&sTheQueue); i++)
 	{
 		pqueuePeek(&sTheQueue, &pBuf, sizeof(char), &pPriBuf);
 		printf("%d. Data: %c , Priority: %d\n\n", i, pBuf, pPriBuf);
-		lstNext(&sTheQueue.sTheList);
 	}
 
 	printf("Hello World! Yes");

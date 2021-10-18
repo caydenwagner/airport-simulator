@@ -92,7 +92,6 @@ void lstInsertAfter (ListPtr psList, const void *pBuffer, int size)
 	{
 		processError("lstInsertAfter", ERROR_INVALID_LIST);
 	}
-
 	if (NULL == pBuffer)
 	{
 		processError("lstInsertAfter", ERROR_NULL_PTR);
@@ -449,7 +448,7 @@ void lstUpdateCurrent (ListPtr psList, const void *pBuffer, int size)
 	}
 
 	free(psList->psCurrent->pData);
-	psList->psCurrent->pData = malloc(sizeof(size));
+	psList->psCurrent->pData = malloc(size);
 
 	memcpy(psList->psCurrent->pData, pBuffer, size);
 }
@@ -565,7 +564,7 @@ void lstInsertBefore (ListPtr psList, const void *pBuffer, int size)
 	}
 
 		ListElementPtr psFinder, psTemp = (ListElementPtr) malloc(sizeof(ListElement));
-		psTemp->pData = malloc(sizeof(size));
+		psTemp->pData = malloc(size);
 
 		memcpy(psTemp->pData, pBuffer, size);
 		psTemp->psNext = psList->psCurrent;
