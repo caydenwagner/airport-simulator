@@ -4,7 +4,7 @@
  Date:			 10/11/21
  Class:			 CS300
  Assignment: pqueueADT
- Purpose:
+ Purpose:		 To create a priority queue ADT backed by a linked list
  *************************************************************************/
 
 #include <stdio.h>
@@ -68,13 +68,13 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
 	}
 }
 /****************************************************************************
- Function:
+ Function:			main
 
- Description:
+ Description:		test all the functionality of the priority queue
 
- Parameters:
+ Parameters:		none
 
- Returned:
+ Returned:			none
  ****************************************************************************/
 int main ()
 {
@@ -84,7 +84,10 @@ int main ()
 	int pPriBuf;
 
 	pqueueLoadErrorMessages();
+	lstLoadErrorMessages();
 
+	pqueueCreate(&sTheQueue);
+	pqueueTerminate(&sTheQueue);
 	pqueueCreate(&sTheQueue);
 
 	assert(0 == pqueueSize(&sTheQueue), "The list is empty",
@@ -97,42 +100,27 @@ int main ()
 		pqueueEnqueue(&sTheQueue, &data, sizeof(int), i);
 		data++;
 	}
-	for (int i = 10; i > -4; i--)
+	for (int i = 10; i > 0; i--)
 	{
 		pqueueEnqueue(&sTheQueue, &data, sizeof(int), i);
 		data++;
 	}
 
-	lstFirst(&sTheQueue.sTheList);
-	for (int i = 0; i < pqueueSize(&sTheQueue); i++)
-	{
-		pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
-		lstNext(&sTheQueue.sTheList);
-		printf("%d. Data: %d , Priority: %d\n\n", i, pBuf, pPriBuf);
-	}
+	pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+	printf("%d. Data: %d , Priority: %d\n\n", 1, pBuf, pPriBuf);
 
 	pqueueDequeue(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
 
-	lstFirst(&sTheQueue.sTheList);
-	for (int i = 0; i < pqueueSize(&sTheQueue); i++)
-	{
-		pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
-		lstNext(&sTheQueue.sTheList);
-		printf("%d. Data: %d , Priority: %d\n\n", i, pBuf, pPriBuf);
-	}
+	pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+	printf("%d. Data: %d , Priority: %d\n\n", 2, pBuf, pPriBuf);
 
 	pqueueChangePriority(&sTheQueue, 10);
 
 	lstFirst(&sTheQueue.sTheList);
 
-	for (int i = 0; i < pqueueSize(&sTheQueue); i++)
-	{
-		pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
-		lstNext(&sTheQueue.sTheList);
-		printf("%d. Data: %d , Priority: %d\n\n", i, pBuf, pPriBuf);
-	}
+	pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+	printf("%d. Data: %d , Priority: %d\n\n", 3, pBuf, pPriBuf);
 
-	printf("Hello World! Yes");
 	pqueueTerminate(&sTheQueue);
 
 	return 0;

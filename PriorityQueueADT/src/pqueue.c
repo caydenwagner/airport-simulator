@@ -93,16 +93,21 @@ bool pqueueIsEmpty (const PriorityQueuePtr psQueue)
 	{
 		processError("pqueueIsEmpty", ERROR_INVALID_PQ);
 	}
-	return (0 == psQueue->sTheList.numElements);
+	return (lstIsEmpty(&psQueue->sTheList));
 }
 /**************************************************************************
- Function:
+ Function:			pqueueEnqueue
 
- Description:
+ Description:		Inserts an element into the queue after every element with
+  							lower priority and before every element with higher
+  							priority
 
- Parameters:		psQueue - a pointer to the queue
+ Parameters:		psQueue  - a pointer to the queue
+ 	 	 	 	 	 	 	 	pBuffer  - a pointer to the data inserted
+ 	 	 	 	 	 	 	 	size     - the size, in bytes, of pBuffer
+ 	 	 	 	 	 	 	 	priority - the priority of the inserted element
 
- Returned:
+ Returned:			None
  *************************************************************************/
 void pqueueEnqueue (PriorityQueuePtr psQueue, const void *pBuffer,
 										int size, int priority)
@@ -151,13 +156,18 @@ void pqueueEnqueue (PriorityQueuePtr psQueue, const void *pBuffer,
 	}
 }
 /**************************************************************************
- Function:
+ Function:			pqueuePeek
 
- Description:
+ Description:		Returns the priority and value of the first element through
+  							the argument list
 
- Parameters:		psQueue - a pointer to the queue
+ Parameters:		psQueue  - a pointer to the queue
+ 	 	 	 	 	 	 	 	pBuffer  - a buffer to store the data
+ 	 	 	 	 	 	 	 	size     - the size, in bytes, of pBuffer
+ 	 	 	 	 	 	 	 	priority - space to store the priority of the removed
+ 	 	 	 	 	 	 	 						 element
 
- Returned:
+ Returned:			A pointer to the data of the first element
  *************************************************************************/
 void *pqueuePeek (PriorityQueuePtr psQueue, void *pBuffer, int size,
 								 int *priority)
@@ -177,7 +187,7 @@ void *pqueuePeek (PriorityQueuePtr psQueue, void *pBuffer, int size,
 
 	PriorityQueueElement sTemp;
 
-	//lstFirst(&(psQueue->sTheList));
+	lstFirst(&(psQueue->sTheList));
 	lstPeek(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElement));
 
 	memcpy(pBuffer, sTemp.pData, size);
@@ -186,13 +196,17 @@ void *pqueuePeek (PriorityQueuePtr psQueue, void *pBuffer, int size,
 	return pBuffer;
 }
 /**************************************************************************
- Function:
+ Function:			pqueueDequeue
 
- Description:
+ Description:		removes the highest priority element from the queue
 
- Parameters:		psQueue - a pointer to the queue
+ Parameters:		psQueue  - a pointer to the queue
+ 	 	 	 	 	 	 	 	pBuffer  - a buffer to store the data
+ 	 	 	 	 	 	 	 	size     - the size, in bytes, of pBuffer
+ 	 	 	 	 	 	 	 	priority - space to store the priority of the removed
+ 	 	 	 	 	 	 	 						 element
 
- Returned:
+ Returned:			A pointer to the data of the removed element
  *************************************************************************/
 void *pqueueDequeue (PriorityQueuePtr psQueue, void *pBuffer,
 										 int size, int  *pPriority)
@@ -224,13 +238,13 @@ void *pqueueDequeue (PriorityQueuePtr psQueue, void *pBuffer,
 	return pBuffer;
 }
 /**************************************************************************
- Function:
+ Function:			pqueueTerminate
 
- Description:
+ Description:		Terminates the priority queue
 
  Parameters:		psQueue - a pointer to the queue
 
- Returned:
+ Returned:			None
  *************************************************************************/
 void pqueueTerminate (PriorityQueuePtr psQueue)
 {
@@ -240,25 +254,31 @@ void pqueueTerminate (PriorityQueuePtr psQueue)
 	}
 	PriorityQueueElement sTemp;
 
-	lstFirst(&psQueue->sTheList);
+	if (!(lstIsEmpty(&psQueue->sTheList)))
+	{
+		lstFirst(&psQueue->sTheList);
 
-		for (int i = 0; i < pqueueSize(psQueue); i++)
-		{
-			lstPeek(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElement));
-			free(sTemp.pData);
-			lstNext(&psQueue->sTheList);
-		}
+			for (int i = 0; i < pqueueSize(psQueue); i++)
+			{
+				lstPeek(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElement));
+				free(sTemp.pData);
+				lstNext(&psQueue->sTheList);
+			}
 
-		lstTerminate(&psQueue->sTheList);
+			lstTerminate(&psQueue->sTheList);
+	}
 }
 /**************************************************************************
- Function:
+ Function:			pqueueChangePriority
 
- Description:
+ Description:		Increases the priority of all elements by the amount in
+ 	 	 	 	 	 	 	 	change
 
  Parameters:		psQueue - a pointer to the queue
+ 	 	 	 	 	 	 	 	change  - an integer value that is added to the priority of
+ 	 	 	 	 	 	 	 	 	 	 	 	 	every list element
 
- Returned:
+ Returned:			None
  *************************************************************************/
 void pqueueChangePriority (PriorityQueuePtr psQueue,
 												   int change)
