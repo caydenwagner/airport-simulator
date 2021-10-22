@@ -1,11 +1,10 @@
 /**************************************************************************
  File name:		 pqueue.c
  Author:			 Cayden Wagner
- Date:				 10/11/21
+ Date:				 10/19/21
  Class:			 	 CS300
  Assignment:	 pqueue ADT
  *************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

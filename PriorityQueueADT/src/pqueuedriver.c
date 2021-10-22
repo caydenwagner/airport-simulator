@@ -1,12 +1,11 @@
 /**************************************************************************
  File name:	 pqueuedriver.c
  Author:		 Cayden Wagner
- Date:			 10/11/21
+ Date:			 10/19/21
  Class:			 CS300
  Assignment: pqueueADT
  Purpose:		 To create a priority queue ADT backed by a linked list
  *************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -78,6 +77,7 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
  ****************************************************************************/
 int main ()
 {
+	const int TEST_NUMBER = 10;
 	PriorityQueue sTheQueue;
 	int data = 0;
 	int pBuf;
@@ -87,40 +87,72 @@ int main ()
 	lstLoadErrorMessages();
 
 	pqueueCreate(&sTheQueue);
+
+//	Purposefully Triggering every failure in each function
+//	pqueueCreate(NULL);
+//	pqueueSize(NULL);
+//	pqueueIsEmpty(NULL);
+//	pqueueEnqueue(NULL, &data, sizeof(int), 0);
+//	pqueueEnqueue(&sTheQueue, NULL, sizeof(int), 0);
+//	pqueueDequeue(NULL, &data, sizeof(int), 0);
+//	pqueueDequeue(&sTheQueue, NULL, sizeof(int), 0);
+//	pqueuePeek(NULL, &data, sizeof(int), 0);
+//	pqueuePeek(&sTheQueue, NULL, sizeof(int), 0);
+//	pqueueChangePriority(NULL, TEST_NUMBER);
+
 	pqueueTerminate(&sTheQueue);
 	pqueueCreate(&sTheQueue);
 
-	assert(0 == pqueueSize(&sTheQueue), "The list is empty",
-																		"The list is not empty");
+	assert(0 == pqueueSize(&sTheQueue), "The queue is has 0 elements",
+																			"The queue contains elements");
 
-	assert(pqueueIsEmpty(&sTheQueue), "The list is empty",
-																	"The list is not empty");
-	for (int i = 0; i < 10; i++)
+	assert(pqueueIsEmpty(&sTheQueue), "The queue is empty",
+																	"The queue is not empty");
+
+	for (int i = 0; i < TEST_NUMBER; i++)
 	{
 		pqueueEnqueue(&sTheQueue, &data, sizeof(int), i);
 		data++;
 	}
-	for (int i = 10; i > 0; i--)
+
+	assert(TEST_NUMBER == pqueueSize(&sTheQueue), "The queue is the right size",
+																							"The list is not the right size");
+
+	for (int i = TEST_NUMBER; i > 0; i--)
 	{
 		pqueueEnqueue(&sTheQueue, &data, sizeof(int), i);
 		data++;
 	}
 
-	pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
-	printf("%d. Data: %d , Priority: %d\n\n", 1, pBuf, pPriBuf);
+	assert(TEST_NUMBER * 2 == pqueueSize(&sTheQueue),
+														"The queue is the right size",
+														"The list is not the right size");
 
-	pqueueDequeue(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+	for (int i = 0; i < TEST_NUMBER; i++)
+	{
+		pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+		printf("%d. Data: %d , Priority: %d\n", i, pBuf, pPriBuf);
+		printf("Queue Size: %d\n\n", pqueueSize(&sTheQueue));
+		pqueueDequeue(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+	}
 
-	pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
-	printf("%d. Data: %d , Priority: %d\n\n", 2, pBuf, pPriBuf);
+	pqueueChangePriority(&sTheQueue, TEST_NUMBER);
 
-	pqueueChangePriority(&sTheQueue, 10);
+	for (int i = 0; i < TEST_NUMBER; i++)
+	{
+		pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+		printf("%d. Data: %d , Priority: %d\n", i, pBuf, pPriBuf);
+		printf("Queue Size: %d\n\n", pqueueSize(&sTheQueue));
+		pqueueDequeue(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
+	}
 
-	lstFirst(&sTheQueue.sTheList);
+	assert(0 == pqueueSize(&sTheQueue), "The queue is has 0 elements",
+																				"The queue contains elements");
 
-	pqueuePeek(&sTheQueue, &pBuf, sizeof(int), &pPriBuf);
-	printf("%d. Data: %d , Priority: %d\n\n", 3, pBuf, pPriBuf);
+	assert(pqueueIsEmpty(&sTheQueue), "The queue is empty",
+																		"The queue is not empty");
 
+	printf("Success");
 	pqueueTerminate(&sTheQueue);
 
 	return 0;
