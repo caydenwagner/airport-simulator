@@ -137,7 +137,7 @@ void pqueueEnqueue (PriorityQueuePtr psQueue, const void *pBuffer,
 		lstPeek(&(psQueue->sTheList), &sTempCurrent,
 						sizeof(PriorityQueueElement));
 
-		while (priority > sTempCurrent.priority &&
+		while (priority >= sTempCurrent.priority &&
 					lstHasNext(&(psQueue->sTheList)))
 		{
 			lstNext(&(psQueue->sTheList));
