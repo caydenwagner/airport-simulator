@@ -122,7 +122,7 @@ void pqueueEnqueue (PriorityQueuePtr psQueue, const void *pBuffer,
 
 	PriorityQueueElement sTemp, sTempCurrent;
 
-	sTemp.pData = malloc(size);
+	sTemp.pData = (void*) malloc(size);
 
 	sTemp.priority = priority;
 	memcpy(sTemp.pData, pBuffer, size);
@@ -232,7 +232,7 @@ void *pqueueDequeue (PriorityQueuePtr psQueue, void *pBuffer,
 
 	free(sTemp.pData);
 
-	lstDeleteCurrent(&psQueue->sTheList, &sTemp, size);
+	lstDeleteCurrent(&psQueue->sTheList, &sTemp, sizeof(PriorityQueueElement));
 
 	return pBuffer;
 }

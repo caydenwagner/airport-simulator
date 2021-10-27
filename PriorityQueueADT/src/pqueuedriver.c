@@ -1,11 +1,22 @@
-/****************************************************************************
- File name:  	pqdriver2.c
- Author:     	chadd williams
- Date:       	Oct 17, 2019
- Class:			 	CS 300
- Assignment:	Priority Queue
- Purpose:			Extended PQ functionality
- ****************************************************************************/
+/**************************************************************************
+ File name:  pqMemTest.c
+ Author:     chadd
+ Date:			 Oct 15, 2019
+ Class:			 CS300
+ Assignment: Priority Queue
+ Purpose:    Memory Stress test for PQ
+ *************************************************************************/
+
+/*
+ * In VirtualBox on a MacBookPro i7
+ *
+ * With Valgrind this takes:  2 m 50 seconds
+ *  time valgrind -v --leak-check=yes --track-origins=yes --leak-check=full
+ *     --show-leak-kinds=all bin/pqMemTest
+ *
+ * Without Valgrind this takes: 1.6 seconds
+ *  time bin/pqMemTest
+ */
 
 #include "../include/pqueue.h"
 #include <stdio.h>
@@ -13,16 +24,17 @@
 #include <stdbool.h>
 #include <string.h>
 
-/*
- * In VirtualBox on a MacBookPro i7
- *
- * With Valgrind this takes:  2 m 10 seconds
- *  time valgrind -v --leak-check=yes --track-origins=yes --leak-check=full
- *     --show-leak-kinds=all bin/pqdriver2
- *
- * Without Valgrind this takes: 1.7 seconds
- *  time bin/pqdriver2
- */
+#define ARRAY_SIZE 100
+// a struct larger than a pointer
+typedef struct BigStruct
+{
+		int aBigArray[ARRAY_SIZE];
+		int number;
+		char letter;
+		double decimal;
+} BigStruct;
+
+typedef enum InsertOrder { FAST, SLOW} InsertOrder;
 
 /****************************************************************************
  Function: 	 	success
@@ -62,7 +74,6 @@ static void failure (char * szStr)
 
  Returned:	 	none
  ****************************************************************************/
-
 static void assert (bool bExpression, char *pTrue, char *pFalse)
 {
 	if (bExpression)
@@ -74,174 +85,192 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
 		failure (pFalse);
 	}
 }
+
+/****************************************************************************
+ Function: 	 	insertInts
+
+ Description: Insert size ints into the PQ.  The int and priority match
+
+ Parameters:	psPQ - the priority queue
+ 	 	 	 	 	 	  size - the number of ints to insert
+							order - the order to insert the priorities
+ Returned:	 	none
+ ****************************************************************************/
+static void insertInts(PriorityQueuePtr psPQ, int size,	InsertOrder order)
+{
+	int i;
+	int start, end, step;
+
+	if( FAST == order)
+	{
+		start = size;
+		step = -1;
+		end = 0;
+	}
+	else
+	{
+		start = 1;
+		step = 1;
+		end = size + 1;
+
+	}
+
+	for(i = start; i != end; i += step)
+	{
+		pqueueEnqueue(psPQ, &i, sizeof(int), i);
+	}
+}
+
+/****************************************************************************
+ Function: 	  removeInts
+
+ Description: Remove size ints from the PQ.  Assert if the removed int
+ 	 	 	 	 	 	 	 and priority don't match
+
+ Parameters:	psPQ - the priority queue
+ 	 	 	 	 	 	  size - the number of ints to remove
+
+ Returned:	 	none
+ ****************************************************************************/
+static bool removeInts(PriorityQueuePtr psPQ, int size)
+{
+	int i, data, priority;
+	bool bRetVal = true;
+
+	for(i = 1; i <= size; ++i)
+	{
+		pqueueDequeue(psPQ, &data, sizeof(int), &priority);
+
+		if( data != priority)
+		{
+			assert(data == priority, "", "removeInts failed");
+			bRetVal = false;
+		}
+	}
+	return bRetVal;
+}
+
 /****************************************************************************
  Function: 	 	main
 
- Description: test all the functionality of the list
+ Description: Stress test the dynamic memory allocation
 
  Parameters:	none
+
  Returned:	 	none
  ****************************************************************************/
 int main ()
 {
+	const int BIG_TEST = 1000000;
 	PriorityQueue sThePQ;
-	int dataValue, priorityValue;
-	int i, j, throwaway;
-	const int SCALE_FAST = 2;
-
-	bool bIsCorrect;
-	const int PRIORITY_MAX = 100;
-	const int VALUE_MAX = 100;
-
-	const int DATA_VALUE = 100;
+	BigStruct sBigData;
+	int priorityValue;
+	int i, j;
 
 	puts ("Program Start\n");
 
 	pqueueLoadErrorMessages();
 
-	puts ("SUCCESS TESTS:\n");
+	pqueueCreate (&sThePQ);
+	success ("PQ Create");
+
+	for(i=0; i < 52; ++i)
+	{
+		sBigData.number = i;
+		sBigData.decimal = (i + (i/52.0));
+		sBigData.letter = i;
+
+		for(j = 0; j < ARRAY_SIZE; ++j)
+		{
+			sBigData.aBigArray[j] = i*ARRAY_SIZE+1;
+		}
+
+		pqueueEnqueue(&sThePQ, &sBigData, sizeof(BigStruct), i);
+	}
+
+	for(i=0; i < 50; ++i)
+	{
+		pqueueDequeue(&sThePQ, &sBigData, sizeof(BigStruct), &priorityValue);
+
+		// be careful comparing floating point numbers!
+		// rounding may cause false negatives.
+		// if decimal is a float rather than a double, errors are
+		// reported
+		if(!(i == priorityValue && sBigData.number == i && sBigData.letter == i
+				&& i+(i/52.0) == sBigData.decimal))
+		{
+			assert(i == priorityValue && sBigData.number == i &&
+					sBigData.letter == i && i+(i/52.0) == sBigData.decimal,
+					"", "BigStruct failed");
+		}
+		for(j=0;j<ARRAY_SIZE;++j)
+		{
+			if (i*ARRAY_SIZE +1 !=  sBigData.aBigArray [j])
+			{
+				assert(i*ARRAY_SIZE +1 ==  sBigData.aBigArray[j],"","Bad value in sBigData");
+			}
+		}
+	}
+
+	pqueueTerminate (&sThePQ);
+	success ("PQ Terminate");
 
 	pqueueCreate (&sThePQ);
 	success ("PQ Create");
 
-	priorityValue = VALUE_MAX * PRIORITY_MAX ;
-
-	for (i = 1; i <= VALUE_MAX; ++i)
-	{
-		for (j = PRIORITY_MAX ; j >= 1; --j)
-		{
-			priorityValue = j;
-			dataValue = i;
-			pqueueEnqueue (&sThePQ, &dataValue, sizeof (int), priorityValue);
-			priorityValue --;
-		}
-	}
-	assert (VALUE_MAX * PRIORITY_MAX == pqueueSize (&sThePQ),
-			"pqueueSize is VALUE_MAX * PRIORITY_MAX",
-			"pqueueSize is not VALUE_MAX * PRIORITY_MAX");
-
-
-	pqueuePeek(&sThePQ, &dataValue, sizeof (int), &priorityValue);
-
-	assert( 1== dataValue && 1 == priorityValue,
-			"Peek found (1,1)", "Peek did not find (1,1)");
-
-	bIsCorrect = true;
-
-	for (i = 1; i <= VALUE_MAX; ++i)
-	{
-		for (j = 1; j <= PRIORITY_MAX; ++j)
-		{
-			pqueueDequeue (&sThePQ, &dataValue, sizeof (int), &priorityValue);
-			if (dataValue != j || priorityValue != i)
-			{
-				bIsCorrect = false;
-			}
-		}
-	}
-
-	assert (bIsCorrect, "Dequeue VALUE_MAX * PRIORITY_MAX Is Correct",
-			"Dequeue VALUE_MAX * PRIORITY_MAX Is NOT Correct");
-
-	priorityValue = VALUE_MAX * PRIORITY_MAX ;
-
-	for (i = 1; i <= VALUE_MAX; ++i)
-	{
-		for (j = PRIORITY_MAX ; j >= 1; --j)
-		{
-			priorityValue = j;
-			dataValue = i;
-			pqueueEnqueue (&sThePQ, &dataValue, sizeof (int), priorityValue--);
-		}
-	}
-
-	dataValue = DATA_VALUE;
-
-	for (i = 0; i < 1000; ++i)
-	{
-		if (i < 250)
-		{
-			pqueueDequeue (&sThePQ, &throwaway, sizeof (int), &priorityValue);
-		}
-		else
-		{
-			++dataValue;
-			pqueueEnqueue (&sThePQ, &dataValue, sizeof (int), 1000 - dataValue);
-		}
-	}
-
-	assert (pqueueSize (&sThePQ) == 10500, "pqueueSize is 10500",
-																		   "pqueueSize is not 10500");
-
-	pqueueDequeue (&sThePQ, &dataValue, sizeof (int), &priorityValue);
-	assert (3 == priorityValue && 51 == dataValue, "Front is (51, 3)",
-																		           "Front is not (51, 3)");
-
-	dataValue = DATA_VALUE;
-	pqueueEnqueue (&sThePQ, &dataValue, sizeof (int), PRIORITY_MAX * VALUE_MAX);
-
-	while (pqueueSize (&sThePQ) > 1)
-	{
-		pqueueDequeue (&sThePQ, &dataValue, sizeof (int), &priorityValue);
-	}
-
-
-	pqueuePeek(&sThePQ, &dataValue, sizeof (int), &priorityValue);
-
-	assert (PRIORITY_MAX * VALUE_MAX == priorityValue && DATA_VALUE == dataValue,
-			"Peek is (100, PRIORITY_MAX * VALUE_MAX)",
-			"Peek is not (100, PRIORITY_MAX * VALUE_MAX)");
-
-
-	pqueueChangePriority(&sThePQ, PRIORITY_MAX);
-
-	pqueueDequeue (&sThePQ, &dataValue, sizeof (int), &priorityValue);
-
-	assert (PRIORITY_MAX * VALUE_MAX + PRIORITY_MAX == priorityValue
-			&& DATA_VALUE == dataValue,
-			"Changed Priority is (100, PRIORITY_MAX * VALUE_MAX + PRIORITY_MAX)",
-			"Changed Priority is not (100, PRIORITY_MAX * VALUE_MAX + PRIORITY_MAX)");
-
-	assert (pqueueSize (&sThePQ) == 0, "pqueueSize is 0",
-																		   "pqueueSize is not 0");
+	insertInts(&sThePQ, BIG_TEST, FAST);
 
 	pqueueTerminate (&sThePQ);
 	success ("PQ Terminate");
 
-	pqueueCreate(&sThePQ);
+	pqueueCreate (&sThePQ);
+	success ("PQ Create");
 
-	for (i = 1; i <= VALUE_MAX / SCALE_FAST; ++i)
+	insertInts(&sThePQ, BIG_TEST, FAST);
+
+	if(removeInts(&sThePQ, BIG_TEST ) )
 	{
-		for (j = PRIORITY_MAX /SCALE_FAST ; j >= 1; --j)
-		{
-			priorityValue = j;
-			dataValue = i;
-			pqueueEnqueue (&sThePQ, &dataValue, sizeof (int), priorityValue);
-		}
+		success("removeInts(&sThePQ, BIG_TEST ) OK");
 	}
-
-	pqueueChangePriority(&sThePQ, 1);
-
-	bIsCorrect = true;
-
-	for (i = 1; i <= VALUE_MAX / SCALE_FAST; ++i)
-	{
-		for (j = 1; j <= PRIORITY_MAX / SCALE_FAST; ++j)
-		{
-			pqueueDequeue (&sThePQ, &dataValue, sizeof (int), &priorityValue);
-			if (dataValue != j || priorityValue - 1 != i)
-			{
-				bIsCorrect = false;
-			}
-		}
-	}
-
-	assert (bIsCorrect, "Huge change priority is correct",
-			"Huge change priority is NOT Correct");
 
 	pqueueTerminate (&sThePQ);
 	success ("PQ Terminate");
 
+	pqueueCreate (&sThePQ);
+	success ("PQ Create");
 
-	puts("Program End");
+	insertInts(&sThePQ, BIG_TEST, FAST);
+
+	if(removeInts(&sThePQ, BIG_TEST / 2 ) )
+	{
+		success("removeInts(&sThePQ, BIG_TEST / 2 ) OK");
+	}
+
+	insertInts(&sThePQ, BIG_TEST / 2, FAST);
+
+	if(removeInts(&sThePQ, BIG_TEST / 2 ) )
+	{
+		success("removeInts(&sThePQ, BIG_TEST / 2 ) OK");
+	}
+
+	if(removeInts(&sThePQ, BIG_TEST / 2 ) )
+	{
+		success("removeInts(&sThePQ, BIG_TEST / 2 ) OK");
+	}
+
+	insertInts(&sThePQ, BIG_TEST / 100, SLOW);
+
+	if(removeInts(&sThePQ, BIG_TEST / 100 ) )
+	{
+		success("removeInts(&sThePQ, BIG_TEST / 100 ) OK");
+	}
+
+	pqueueTerminate (&sThePQ);
+	success ("PQ Terminate");
+
+	puts ("\nProgram End");
+
+	return EXIT_SUCCESS;
 }
+
+
