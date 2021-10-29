@@ -1,17 +1,17 @@
 /**************************************************************************
- File name:	 queuedriver.c
+ File name:	 airporttestdriver.c
  Author:		 Cayden Wagner
- Date:			 10/11/21
+ Date:			 10/27/21
  Class:			 CS300
- Assignment: pqueueADT
- Purpose:		 to test the functionality of the queue ADT
+ Assignment: airport
+ Purpose:
  *************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "../include/queue.h"
+#include "../include/airport.h"
 #include <limits.h>
 #include <float.h>
 /**************************************************************************
@@ -73,29 +73,7 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
  ****************************************************************************/
 int main ()
 {
-	int num = 5, num2 = 10;
-	int buf;
-	Queue sTheQueue;
 
-	queueCreate(&sTheQueue);
-
-	assert(queueIsEmpty(&sTheQueue), "List is empty", "List is not empty");
-	queueEnqueue(&sTheQueue, &num, sizeof(int));
-	assert(queueSize(&sTheQueue) == 1, "Size is 1", "Size is not 1");
-
-	queueEnqueue(&sTheQueue, &num2, sizeof(int));
-
-	queuePeek(&sTheQueue, &buf, sizeof(int));
-	assert(buf == num, "Data matches", "Data does not match");
-
-	queueDequeue(&sTheQueue, &buf, sizeof(int));
-	assert(buf == num, "Data matches", "Data does not match");
-
-	queueDequeue(&sTheQueue, &buf, sizeof(int));
-	assert(buf == num2, "Data matches", "Data does not match");
-
-	queueTerminate(&sTheQueue);
-	puts("Success!");
-
-	return EXIT_SUCCESS;
+	printf("Success");
+	return 0;
 }

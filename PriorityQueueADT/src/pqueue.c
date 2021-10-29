@@ -36,7 +36,7 @@ void pqueueLoadErrorMessages ()
 
  Returned:	 		None
  *************************************************************************/
-static void processError (const char *pszFunctionName, int errorCode)
+void processError (const char *pszFunctionName, int errorCode)
 {
 	printf ("Function: %s %s \n ", pszFunctionName,
 			gszPQErrors [errorCode]);
