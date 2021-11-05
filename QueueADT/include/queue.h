@@ -9,7 +9,6 @@
                 structure using your existing Priority Queue.
  *************************************************************************/
 
-
 #ifndef QUEUE_H_
 #define QUEUE_H_
 

@@ -71,9 +71,24 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
 
  Returned:			EXIT SUCCESS
  ****************************************************************************/
-int main ()
+int main (int argc, char **argv)
 {
+	Airport sTheAirport;
+	FILE *fPtr;
 
-	printf("Success");
+	airportLoadErrorMessages ();
+	fPtr = fopen(argv[1], "r");
+
+	if (fPtr == NULL)
+	{
+		printf("Error! File not found\n\n");
+		EXIT_FAILURE;
+	}
+
+	airportCreate(&sTheAirport);
+
+	airportTerminate(&sTheAirport);
+
+	printf("\n\nSuccess");
 	return 0;
 }
