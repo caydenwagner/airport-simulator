@@ -73,6 +73,10 @@ static void assert (bool bExpression, char *pTrue, char *pFalse)
  ****************************************************************************/
 int main (int argc, char **argv)
 {
+	const int FIRST_READ_SIZE = 3;
+	const int SECOND_READ_SIZE = 6;
+	const int THIRD_READ_SIZE = 6;
+	int pBuf;
 	Airport sTheAirport;
 	FILE *fPtr;
 
@@ -87,8 +91,43 @@ int main (int argc, char **argv)
 
 	airportCreate(&sTheAirport);
 
+	printf("Line 1:\n");
+	airportReadLine(&sTheAirport, fPtr);
+	assert(FIRST_READ_SIZE == airportRunwaySize(&sTheAirport),
+				 "Success, size is 3", "Failure");
+	assert(FIRST_READ_SIZE == airportInFlightSize(&sTheAirport),
+				 "Success, size is 3", "Failure");
+	peekInFlightPQ(&sTheAirport, &pBuf);
+	printf("The highest priority plane is: %d\n\n", pBuf);
+
+	printf("Line 2:\n");
+	airportReadLine(&sTheAirport, fPtr);
+	assert(SECOND_READ_SIZE == airportRunwaySize(&sTheAirport),
+				 "Success, size is 6", "Failure");
+	assert(SECOND_READ_SIZE == airportInFlightSize(&sTheAirport),
+				 "Success, size is 6", "Failure");
+	peekInFlightPQ(&sTheAirport, &pBuf);
+	printf("The highest priority plane is: %d\n\n", pBuf);
+
+	printf("Line 3:\n");
+	airportReadLine(&sTheAirport, fPtr);
+	assert(THIRD_READ_SIZE == airportRunwaySize(&sTheAirport),
+				 "Success, size is 6", "Failure");
+	assert(THIRD_READ_SIZE == airportInFlightSize(&sTheAirport),
+				 "Success, size is 6", "Failure");
+	peekInFlightPQ(&sTheAirport, &pBuf);
+	printf("The highest priority plane is: %d\n\n", pBuf);
+
+	pBuf = 0;
+	dequeueInFlightPQ(&sTheAirport, &pBuf);
+	printf("Dequeue, The priority was: %d\n\n", pBuf);
+	peekInFlightPQ(&sTheAirport, &pBuf);
+	printf("The highest priority plane is: %d\n\n", pBuf);
+	assert(THIRD_READ_SIZE  - 1 == airportInFlightSize(&sTheAirport),
+				 "Success, size is 5", "Failure");
+
 	airportTerminate(&sTheAirport);
 
-	printf("\n\nSuccess");
+	printf("\nSuccess\n\n");
 	return 0;
 }

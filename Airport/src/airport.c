@@ -127,7 +127,7 @@ void enqueueRunway(AirportPtr psTheAirport)
 {
 	if (NULL == psTheAirport)
 	{
-		processError("enqueueRunway", ERROR_NO_AIRPORT_TERMINATE);
+		processError("enqueueRunway", ERROR_INVALID_AIRPORT);
 	}
 
 	Airplane sAirplane;
@@ -140,7 +140,7 @@ void enqueueRunway(AirportPtr psTheAirport)
 
  Parameters:		psTheAiport - the address of the airport
  	 	 	 	 	 	 	 	fuel 				- the fuel of the queued airplane, used as the
- 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	priority in the in f;light priority queue
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	priority in the in flight priority queue
 
  Returned:	 		None
  *************************************************************************/
@@ -148,11 +148,161 @@ void enqueueInFlightPQ (AirportPtr psTheAirport, int fuel)
 {
 	if (NULL == psTheAirport)
 	{
-		processError("enqueueRunway", ERROR_NO_AIRPORT_TERMINATE);
+		processError("enqueueRunway", ERROR_INVALID_AIRPORT);
 	}
 
 	Airplane sAirplane;
+	sAirplane.fuel = fuel;
 	pqueueEnqueue(&(psTheAirport->sInFlightPQueue), &sAirplane, sizeof(Airplane),
-								fuel);
+								sAirplane.fuel);
 }
+/**************************************************************************
+ Function:			airportRunwaySize
 
+ Description:		returns the size of the airport runway queue
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		an integer value that is the number of elements in the
+ 	 	 	 	 	 	 	 	runway queue
+ *************************************************************************/
+int airportRunwaySize (AirportPtr psTheAirport)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("airportRunwaySize", ERROR_INVALID_AIRPORT);
+	}
+	return queueSize(&(psTheAirport->sRunwayQueue));
+}
+/**************************************************************************
+ Function:			airportInFlightSize
+
+ Description:		returns the size of the airport in flight priority queue
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		an integer value that is the number of elements in the
+ 	 	 	 	 	 	 	 	in flight priority queue
+ *************************************************************************/
+int airportInFlightSize (AirportPtr psTheAirport)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("airportInFlightSize", ERROR_INVALID_AIRPORT);
+	}
+	return pqueueSize(&(psTheAirport->sInFlightPQueue));
+}
+/**************************************************************************
+ Function:			peekInFlightPQ
+
+ Description:		checks the priority of the first element in the in flight
+  							priority queue
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		the priority of the first element in the in flight priority
+  							queue
+ *************************************************************************/
+int peekInFlightPQ (AirportPtr psTheAirport, int* pBuf)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("peekInFlightPQ", ERROR_INVALID_AIRPORT);
+	}
+	if (NULL == pBuf)
+	{
+		processError("peekInFlightPQ", ERROR_NULL_PTR_AIRPLANE);
+	}
+	if (emptyAirportInFlightPQ(psTheAirport))
+	{
+		processError("peekInFlightPQ", ERROR_EMPTY_IN_FLIGHT_PQ);
+	}
+	Airplane sAirplane;
+	pqueuePeek(&(psTheAirport->sInFlightPQueue), &sAirplane, sizeof(Airplane),
+						 pBuf);
+
+	return *pBuf;
+}
+/**************************************************************************
+ Function:			emptyAirportRunway
+
+ Description:		checks if the runway is empty or not
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		true if the runway queue contains 0 elements, else false
+ *************************************************************************/
+bool emptyAirportRunway (AirportPtr psTheAirport)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("emptyAirportRunway", ERROR_INVALID_AIRPORT);
+	}
+
+	return queueIsEmpty(&(psTheAirport->sRunwayQueue));
+}
+/**************************************************************************
+ Function:			emptyAirportInFlightPQ
+
+ Description:		checks if the in flight priority queue is empty or not
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		true if the priority queue contains 0 elements, else false
+ *************************************************************************/
+bool emptyAirportInFlightPQ (AirportPtr psTheAirport)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("emptyAirportInFlightPQ", ERROR_INVALID_AIRPORT);
+	}
+
+	return pqueueIsEmpty(&(psTheAirport->sInFlightPQueue));
+}
+/**************************************************************************
+ Function:			dequeueRunway
+
+ Description:		dequeues the first element in the runway queue
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		None
+ *************************************************************************/
+void dequeueRunway (AirportPtr psTheAirport)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("dequeueRunway", ERROR_INVALID_AIRPORT);
+	}
+	if (emptyAirportInFlightPQ(psTheAirport))
+	{
+		processError("dequeueRunway", ERROR_EMPTY_RUNWAY);
+	}
+	Airplane sAirplane;
+	queueDequeue(&(psTheAirport->sRunwayQueue), &sAirplane, sizeof(Airplane));
+}
+/**************************************************************************
+ Function:			dequeueInFlightPQ
+
+ Description:		dequeues the highest priority element in the in flight
+ 	 	 	 	 	 	 	 	priority queue
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		None
+ *************************************************************************/
+void dequeueInFlightPQ (AirportPtr psTheAirport, int* pBuf)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("dequeueInFlightPQ", ERROR_INVALID_AIRPORT);
+	}
+	if (emptyAirportInFlightPQ(psTheAirport))
+	{
+		processError("dequeueInFlightPQ", ERROR_EMPTY_IN_FLIGHT_PQ);
+	}
+	Airplane sAirplane;
+
+	pqueueDequeue(&(psTheAirport->sInFlightPQueue), &sAirplane, sizeof(Airplane),
+								pBuf);
+}

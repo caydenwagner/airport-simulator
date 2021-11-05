@@ -113,7 +113,7 @@ extern void *pqueueDequeue (PriorityQueuePtr psQueue, void *pBuffer,
 //*************************************************************************
 
 extern void *pqueuePeek (PriorityQueuePtr psQueue, void *pBuffer, int size,
-								 int *priority);
+												 int *priority);
 // requires: psQueue is not empty
 // results: The priority and value of the first element is returned through
 //					the argument list
