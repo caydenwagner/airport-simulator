@@ -43,8 +43,10 @@ static void failure (char * szStr)
 }
 /****************************************************************************
  Function: 	 	assert
+
  Description: if the expression is true, assert success; otherwise, assert
  	 	 	 	 	 	 	failure
+
  Parameters:	bExpression - The validity of the expression passed in, either
   													true or false
   						pTrue				- The message that is printed if the statement is
@@ -127,6 +129,8 @@ int main (int argc, char **argv)
 				 "Success, size is 5", "Failure");
 
 	airportTerminate(&sTheAirport);
+
+	fclose(fPtr);
 
 	printf("\nSuccess\n\n");
 	return 0;
