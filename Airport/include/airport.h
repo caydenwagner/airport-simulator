@@ -11,6 +11,8 @@
 #define AIRPORT_H_
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../../QueueADT/include/queue.h"
 #include "../../ListADT/include/list.h"
 
@@ -19,6 +21,7 @@
 //*************************************************************************
 #define MAX_ERROR_AIRPORT_CHARS 64
 #define NUM_RUNWAYS 3
+#define MAX_PLANES 3
 
 enum {NO_AIRPORT_ERROR = 0,
 			ERROR_NO_AIRPORT_CREATE,
@@ -60,7 +63,17 @@ typedef struct Airport
 	PriorityQueue sInFlightPQueue;
 	char aRunwayStatus[NUM_RUNWAYS];
 	int timer;
+	int crashCount;
 } Airport;
+
+typedef struct AirportStats *AirportStatsPtr;
+typedef struct AirportStats
+{
+	int Takeoff;
+	int Landing;
+	int aFuelRemaining[MAX_PLANES];
+
+} AirportStats;
 
 //*************************************************************************
 //										Allocation and Deallocation
@@ -72,7 +85,7 @@ extern void airportTerminate (AirportPtr);
 
 extern void airportLoadErrorMessages ();
 
-extern void airportReadLine (AirportPtr, FILE*);
+extern void airportReadLine (AirportPtr, FILE*, AirportStatsPtr);
 
 extern int airportRunwaySize (AirportPtr);
 
@@ -81,6 +94,10 @@ extern int airportInFlightSize (AirportPtr);
 extern bool emptyAirportRunway (AirportPtr);
 
 extern bool emptyAirportInFlightPQ (AirportPtr);
+
+void airportIncrementTimer (AirportPtr);
+
+void airportPrintRow (AirportPtr, AirportStatsPtr);
 
 //*************************************************************************
 //									Inserting and retrieving values

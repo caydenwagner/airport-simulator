@@ -11,6 +11,11 @@
 #include <stdbool.h>
 #include "../include/airport.h"
 
+const char EMPTY_RUNWAY = 'E';
+const char LANDING_RUNWAY = 'L';
+const char TAKEOFF_RUNWAY = 'T';
+const int MAX_RUNWAYS = 3;
+
 char gszAirportErrors[NUMBER_OF_AIRPORT_ERRORS][MAX_ERROR_AIRPORT_CHARS];
 /**************************************************************************
  Function: 	 		processError
@@ -63,6 +68,12 @@ void airportCreate (AirportPtr psTheAirport)
 	}
 	queueCreate(&(psTheAirport->sRunwayQueue));
 	pqueueCreate(&(psTheAirport->sInFlightPQueue));
+	psTheAirport->timer = 1;
+	for (int i = 0; i < MAX_RUNWAYS; i++)
+	{
+		psTheAirport->aRunwayStatus[i] = EMPTY_RUNWAY;
+		psTheAirport->crashCount = 0;
+	}
 }
 /**************************************************************************
  Function:			airportTerminate
@@ -94,24 +105,43 @@ void airportTerminate (AirportPtr psTheAirport)
 
  Returned:	 		None
  *************************************************************************/
-void airportReadLine (AirportPtr psTheAirport, FILE *fPtr)
+void airportReadLine (AirportPtr psTheAirport, FILE *fPtr,
+											AirportStatsPtr sStats)
 {
 	const int MAX_NUM_PLANES = 3;
-	int numTakeoffPlanes, numLandingPlanes;
+	const int EMPTY = -1;
+	int numTakeoffPlanes = 0, numLandingPlanes = 0;
 	int aFuel[MAX_NUM_PLANES];
+
+	for (int i = 0; i < MAX_NUM_PLANES; i++)
+	{
+		sStats->aFuelRemaining[i] = EMPTY;
+	}
 
 	fscanf(fPtr,"%d", &numTakeoffPlanes);
 	fscanf(fPtr,"%d", &numLandingPlanes);
+
+	sStats->Landing = numLandingPlanes;
+	sStats->Takeoff = numTakeoffPlanes;
 
 	for (int i = 0; i < numTakeoffPlanes; i++)
 	{
 		enqueueRunway(psTheAirport);
 	}
 
-	for (int i = 0; i < numLandingPlanes; i++)
+	for (int i = 0; i < MAX_NUM_PLANES; i++)
 	{
 		fscanf(fPtr,"%d", &aFuel[i]);
+	}
+
+	for (int i = 0; i < numLandingPlanes; i++)
+	{
 		enqueueInFlightPQ(psTheAirport, aFuel[i]);
+	}
+
+	for (int i = 0; i < numLandingPlanes; i++)
+	{
+		sStats->aFuelRemaining[i] = aFuel[i];
 	}
 }
 /**************************************************************************
@@ -305,4 +335,66 @@ void dequeueInFlightPQ (AirportPtr psTheAirport, int* pBuf)
 
 	pqueueDequeue(&(psTheAirport->sInFlightPQueue), &sAirplane, sizeof(Airplane),
 								pBuf);
+}
+/**************************************************************************
+ Function:
+
+ Description:
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		None
+ *************************************************************************/
+void airportIncrementTimer (AirportPtr psTheAirport) {
+	if (NULL == psTheAirport)
+	{
+		processError("AirportIncrementTimer", ERROR_INVALID_AIRPORT);
+	}
+	psTheAirport->timer++;
+}
+/**************************************************************************
+ Function:
+
+ Description:
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		None
+ *************************************************************************/
+void airportPrintRow (AirportPtr psTheAirport, AirportStatsPtr sStats)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("AirportPrintTimer", ERROR_INVALID_AIRPORT);
+	}
+	const int EMPTY = -1;
+	const char EMPTY_CHAR = '-';
+	const int COL_1_SPACES = 4;
+	const int COL_2_SPACES = 7;
+	const int COL_3_SPACES = 9;
+	const int COL_4_SPACES = 5;
+
+	fprintf(stdout, "%*d", COL_1_SPACES, psTheAirport->timer);
+	printf(" | ");
+	printf("%*d", COL_2_SPACES, sStats->Takeoff);
+	printf("%*d", COL_3_SPACES, sStats->Landing);
+	printf(" |");
+
+	for (int i = 0; i < MAX_PLANES; i++)
+	{
+		if (EMPTY == sStats->aFuelRemaining[i])
+		{
+			printf("%*c", COL_4_SPACES, EMPTY_CHAR);
+		}
+		else
+		{
+			printf("%*d", COL_4_SPACES, sStats->aFuelRemaining[i]);
+		}
+	}
+
+	printf(" | ");
+
+	printf("\n");
+
+
 }

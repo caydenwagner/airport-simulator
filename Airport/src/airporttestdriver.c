@@ -80,9 +80,15 @@ int main (int argc, char **argv)
 	const int THIRD_READ_SIZE = 6;
 	int pBuf;
 	Airport sTheAirport;
+	AirportStats sStats;
 	FILE *fPtr;
 
 	airportLoadErrorMessages ();
+	if (!(argc > 0))
+	{
+		printf("Error, expected data file in command line\n\n");
+		return EXIT_FAILURE;
+	}
 	fPtr = fopen(argv[1], "r");
 
 	if (fPtr == NULL)
@@ -94,7 +100,7 @@ int main (int argc, char **argv)
 	airportCreate(&sTheAirport);
 
 	printf("Line 1:\n");
-	airportReadLine(&sTheAirport, fPtr);
+	airportReadLine(&sTheAirport, fPtr, &sStats);
 	assert(FIRST_READ_SIZE == airportRunwaySize(&sTheAirport),
 				 "Success, size is 3", "Failure");
 	assert(FIRST_READ_SIZE == airportInFlightSize(&sTheAirport),
@@ -103,7 +109,7 @@ int main (int argc, char **argv)
 	printf("The highest priority plane is: %d\n\n", pBuf);
 
 	printf("Line 2:\n");
-	airportReadLine(&sTheAirport, fPtr);
+	airportReadLine(&sTheAirport, fPtr, &sStats);
 	assert(SECOND_READ_SIZE == airportRunwaySize(&sTheAirport),
 				 "Success, size is 6", "Failure");
 	assert(SECOND_READ_SIZE == airportInFlightSize(&sTheAirport),
@@ -112,7 +118,7 @@ int main (int argc, char **argv)
 	printf("The highest priority plane is: %d\n\n", pBuf);
 
 	printf("Line 3:\n");
-	airportReadLine(&sTheAirport, fPtr);
+	airportReadLine(&sTheAirport, fPtr, &sStats);
 	assert(THIRD_READ_SIZE == airportRunwaySize(&sTheAirport),
 				 "Success, size is 6", "Failure");
 	assert(THIRD_READ_SIZE == airportInFlightSize(&sTheAirport),

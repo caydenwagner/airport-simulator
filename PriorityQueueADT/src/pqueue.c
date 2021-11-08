@@ -75,7 +75,7 @@ int pqueueSize (const PriorityQueuePtr psQueue)
 	{
 		processError("pqueueSize", ERROR_INVALID_PQ);
 	}
-	return psQueue->sTheList.numElements;
+	return lstSize(&(psQueue->sTheList));
 }
 /**************************************************************************
  Function:			pqueueIsEmpty
