@@ -61,6 +61,7 @@ strcpy(gszAirportErrors[ERROR_EMPTY_AIRPORT] \
 typedef struct Airplane
 {
 	int fuel;
+	int entryTimer;
 } Airplane;
 typedef Airplane* AirplanePtr;
 
@@ -78,9 +79,16 @@ typedef struct Airport
 typedef struct AirportStats *AirportStatsPtr;
 typedef struct AirportStats
 {
-	int Takeoff;
-	int Landing;
+	int currentNumTakeoff;
+	int currentNumLanding;
+	int totalNumTakeoff;
+	int totalNumLanding;
 	int aFuelRemaining[MAX_PLANES];
+	int totalLandingWait;
+	int totalTakeoffWait;
+	int totalTimeRemaining;
+	int numPlanesWithNoFuel;
+	int numCrashes;
 
 } AirportStats;
 
@@ -88,7 +96,7 @@ typedef struct AirportStats
 //										Allocation and Deallocation
 //*************************************************************************
 
-extern void airportCreate (AirportPtr);
+extern void airportCreate (AirportPtr, AirportStatsPtr);
 
 extern void airportTerminate (AirportPtr);
 
@@ -106,7 +114,9 @@ extern void dequeueRunway (AirportPtr);
 
 extern void dequeueInFlightPQ (AirportPtr, int*);
 
-extern int peekInFlightPQ (AirportPtr, int*);
+extern Airplane peekInFlightPQ (AirportPtr, int*, int*);
+
+extern Airplane peekRunway(AirportPtr, int*);
 
 void airportPrintRow (AirportPtr, AirportStatsPtr);
 

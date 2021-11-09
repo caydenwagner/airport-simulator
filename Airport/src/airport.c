@@ -61,7 +61,7 @@ void airportLoadErrorMessages ()
 
  Returned:	 		None
  *************************************************************************/
-void airportCreate (AirportPtr psTheAirport)
+void airportCreate (AirportPtr psTheAirport, AirportStatsPtr psStats)
 {
 	if (NULL == psTheAirport)
 	{
@@ -75,6 +75,13 @@ void airportCreate (AirportPtr psTheAirport)
 		psTheAirport->aRunwayStatus[i] = EMPTY_RUNWAY;
 		psTheAirport->crashCount = 0;
 	}
+	psStats->totalLandingWait = 0;
+	psStats->totalTakeoffWait = 0;
+	psStats->totalNumLanding = 0;
+	psStats->totalNumTakeoff = 0;
+	psStats->totalTimeRemaining = 0;
+	psStats->numCrashes = 0;
+	psStats->numPlanesWithNoFuel = 0;
 }
 /**************************************************************************
  Function:			airportTerminate
@@ -123,8 +130,8 @@ void airportReadLine (AirportPtr psTheAirport, FILE *fPtr,
 	fscanf(fPtr,"%d", &numTakeoffPlanes);
 	fscanf(fPtr,"%d", &numLandingPlanes);
 
-	sStats->Landing = numLandingPlanes;
-	sStats->Takeoff = numTakeoffPlanes;
+	sStats->currentNumLanding = numLandingPlanes;
+	sStats->currentNumTakeoff = numTakeoffPlanes;
 
 	for (int i = 0; i < numTakeoffPlanes; i++)
 	{
@@ -163,6 +170,7 @@ void enqueueRunway(AirportPtr psTheAirport)
 	}
 
 	Airplane sAirplane;
+	sAirplane.entryTimer = psTheAirport->timer;
 	queueEnqueue(&(psTheAirport->sRunwayQueue), &sAirplane, sizeof(Airplane));
 }
 /**************************************************************************
@@ -184,6 +192,7 @@ void enqueueInFlightPQ (AirportPtr psTheAirport, int fuel)
 	}
 
 	Airplane sAirplane;
+	sAirplane.entryTimer = psTheAirport->timer;
 	sAirplane.fuel = fuel;
 	pqueueEnqueue(&(psTheAirport->sInFlightPQueue), &sAirplane, sizeof(Airplane),
 								sAirplane.fuel);
@@ -232,16 +241,19 @@ int airportInFlightSize (AirportPtr psTheAirport)
 
  Parameters:		psTheAiport - the address of the airport
 
- Returned:	 		the priority of the first element in the in flight priority
-  							queue
+ Returned:	 		a pointer to the highest priority airplane
  *************************************************************************/
-int peekInFlightPQ (AirportPtr psTheAirport, int* pBuf)
+Airplane peekInFlightPQ (AirportPtr psTheAirport, int* pFuel, int* pTimer)
 {
 	if (NULL == psTheAirport)
 	{
 		processError("peekInFlightPQ", ERROR_INVALID_AIRPORT);
 	}
-	if (NULL == pBuf)
+	if (NULL == pFuel)
+	{
+		processError("peekInFlightPQ", ERROR_NULL_PTR_AIRPLANE);
+	}
+	if (NULL == pTimer)
 	{
 		processError("peekInFlightPQ", ERROR_NULL_PTR_AIRPLANE);
 	}
@@ -251,9 +263,39 @@ int peekInFlightPQ (AirportPtr psTheAirport, int* pBuf)
 	}
 	Airplane sAirplane;
 	pqueuePeek(&(psTheAirport->sInFlightPQueue), &sAirplane, sizeof(Airplane),
-						 pBuf);
+						 pFuel);
+	*pTimer = sAirplane.entryTimer;
 
-	return *pBuf;
+	return sAirplane;
+}
+/**************************************************************************
+ Function:			peekRunway
+
+ Description:		checks the airplane at the front of the runway queue
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		the airplane at the front of the queue
+ *************************************************************************/
+Airplane peekRunway (AirportPtr psTheAirport, int* pTimer)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("peekRunway", ERROR_INVALID_AIRPORT);
+	}
+	if (NULL == pTimer)
+	{
+		processError("peekRunway", ERROR_NULL_PTR_AIRPLANE);
+	}
+	if (emptyAirportRunway(psTheAirport))
+	{
+		processError("peekRunway", ERROR_EMPTY_IN_FLIGHT_PQ);
+	}
+	Airplane sAirplane;
+	queuePeek(&(psTheAirport->sRunwayQueue), &sAirplane, sizeof(Airplane));
+	*pTimer = sAirplane.entryTimer;
+
+	return sAirplane;
 }
 /**************************************************************************
  Function:			emptyAirportRunway
@@ -383,8 +425,8 @@ void airportPrintRow (AirportPtr psTheAirport, AirportStatsPtr sStats)
 
 	fprintf(stdout, "%*d", COL_1_SPACES, psTheAirport->timer);
 	printf(" | ");
-	printf("%*d", COL_2_SPACES, sStats->Takeoff);
-	printf("%*d", COL_3_SPACES, sStats->Landing);
+	printf("%*d", COL_2_SPACES, sStats->currentNumTakeoff);
+	printf("%*d", COL_3_SPACES, sStats->currentNumLanding);
 	printf(" |");
 
 	for (int i = 0; i < MAX_PLANES; i++)
@@ -437,22 +479,29 @@ void updateAirport (AirportPtr psTheAirport, AirportStatsPtr sStats)
 
 	bool bEmergency = true, bEmpty = false;
 	int runwaysTaken = 0;
-	int fuel;
+	int fuel, entryTimer;
+	Airplane sTemp;
 
 	while(bEmergency && MAX_PLANES > runwaysTaken &&
 			 (!(emptyAirportInFlightPQ(psTheAirport))))
 	{
-		peekInFlightPQ(psTheAirport, &fuel);
+		sTemp = peekInFlightPQ(psTheAirport, &fuel, &entryTimer);
 		if (fuel < 0)
 		{
 			psTheAirport->crashCount++;
+			sStats->numCrashes++;
 			dequeueInFlightPQ(psTheAirport, &fuel);
+			sStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
+			sStats->totalTimeRemaining += fuel;
 		}
-		else if(0 == fuel)
+		else if (0 == fuel)
 		{
 			dequeueInFlightPQ(psTheAirport, &fuel);
 			psTheAirport->aRunwayStatus[runwaysTaken] = EMERGENCY_RUNWAY;
 			runwaysTaken++;
+			sStats->numPlanesWithNoFuel++;
+			sStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
+			sStats->totalTimeRemaining += fuel;
 		}
 		else
 		{
@@ -465,15 +514,20 @@ void updateAirport (AirportPtr psTheAirport, AirportStatsPtr sStats)
 		if (airportRunwaySize(psTheAirport) > airportInFlightSize(psTheAirport) &&
 				(!(emptyAirportRunway(psTheAirport))))
 		{
+			sTemp = peekRunway(psTheAirport, &entryTimer);
 			dequeueRunway(psTheAirport);
 			psTheAirport->aRunwayStatus[runwaysTaken] = TAKEOFF_RUNWAY;
 			runwaysTaken++;
+			sStats->totalTakeoffWait += psTheAirport->timer - sTemp.entryTimer + 1;
 		}
 		else if ((!(emptyAirportInFlightPQ(psTheAirport))))
 		{
+			sTemp = peekInFlightPQ(psTheAirport, &fuel, &entryTimer);
 			dequeueInFlightPQ(psTheAirport, &fuel);
 			psTheAirport->aRunwayStatus[runwaysTaken] = LANDING_RUNWAY;
 			runwaysTaken++;
+			sStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
+			sStats->totalTimeRemaining += fuel;
 		}
 		else
 		{
@@ -520,8 +574,10 @@ void setNextTurn (AirportPtr psTheAirport, AirportStatsPtr psStats)
 	}
 
 	psTheAirport->crashCount = 0;
-	psStats->Takeoff = 0;
-	psStats->Landing = 0;
+	psStats->totalNumTakeoff += psStats->currentNumTakeoff;
+	psStats->totalNumLanding += psStats->currentNumLanding;
+	psStats->currentNumTakeoff = 0;
+	psStats->currentNumLanding = 0;
 	for (int i = 0; i < MAX_PLANES; i++)
 	{
 		psTheAirport->aRunwayStatus[i] = EMPTY_RUNWAY;

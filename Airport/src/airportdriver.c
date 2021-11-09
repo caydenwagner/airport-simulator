@@ -29,6 +29,7 @@ void printDivider ();
 void printCol (int, char[], int);
 void printRow1 ();
 void printRow2 ();
+void calculateStats (AirportStatsPtr);
 /****************************************************************************
  Function:		main
 
@@ -51,17 +52,18 @@ int main (int argc, char **argv)
 		printf("Error, expected data file in command line\n\n");
 		return EXIT_FAILURE;
 	}
+	else {
+		fPtr = fopen(argv[1], "r");
 
-	fPtr = fopen(argv[1], "r");
-
-	if (NULL == fPtr)
-	{
-		printf("Error! File not found\n\n");
-		EXIT_FAILURE;
+		if (NULL == fPtr)
+		{
+			printf("Error! File not found\n\n");
+			EXIT_FAILURE;
+		}
 	}
 
+	airportCreate(&sTheAirport, &sStats);
 	printHeader();
-	airportCreate(&sTheAirport);
 
 	do
 	{
@@ -74,10 +76,14 @@ int main (int argc, char **argv)
 		airportPrintRow(&sTheAirport, &sStats);
 		airportIncrementTimer(&sTheAirport);
 		setNextTurn(&sTheAirport, &sStats);
-	}	while (!(emptyAirportRunway(&sTheAirport)) ||
-			 (!(emptyAirportInFlightPQ(&sTheAirport))));
+	}	while ((!(emptyAirportRunway(&sTheAirport)) ||
+			 (!(emptyAirportInFlightPQ(&sTheAirport)))) || (!feof(fPtr)));
+
+
 
 	fclose(fPtr);
+
+	calculateStats (&sStats);
 	airportTerminate(&sTheAirport);
 
 	return 0;
@@ -226,4 +232,33 @@ void printRow2 ()
 	printCol(COL_4_WIDTH, ROW2[4], 0);
 
 	printf("\n");
+}
+/****************************************************************************
+ Function:
+
+ Description:
+
+ Parameters:
+
+ Returned:		None
+ ****************************************************************************/
+void calculateStats(AirportStatsPtr psStats)
+{
+	double avgLandingWait, avgTakeoffWait;
+	double avgFuelRemaining;
+	avgLandingWait = psStats->totalLandingWait /(double)psStats->totalNumLanding;
+	avgTakeoffWait = psStats->totalTakeoffWait /(double)psStats->totalNumTakeoff;
+	avgFuelRemaining = psStats->totalTimeRemaining
+															 /(double)psStats->totalNumLanding;
+
+	printf("\nAverage takeoff waiting time: %g\n", avgTakeoffWait);
+
+	printf("Average landing waiting time: %g\n", avgLandingWait);
+
+	printf("Average flying time remaining on landing: %g\n", avgFuelRemaining);
+
+	printf("Number of planes landing with zero fuel: %d\n",
+					psStats->numPlanesWithNoFuel);
+
+	printf("Number of crashes: %d\n\n", psStats->numCrashes);
 }
