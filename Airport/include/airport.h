@@ -1,10 +1,11 @@
 /**************************************************************************
- File name:
+ File name:			airport.h
  Author:        CS, Pacific University
- Date:
+ Date:				  November 8 ,2021
  Class:         CS300
  Assignment:    Airport Simulation
- Purpose:
+ Purpose:				To define the constants, data structures, and
+                function prototypes for implementing an Airport
  *************************************************************************/
 
 #ifndef AIRPORT_H_
@@ -36,14 +37,22 @@ enum {NO_AIRPORT_ERROR = 0,
 //*************************************************************************
 // Error Messages
 //*************************************************************************
-#define LOAD_AIRPORT_ERRORS strcpy(gszAirportErrors[NO_AIRPORT_ERROR], "No Error.");\
-strcpy(gszAirportErrors[ERROR_NO_AIRPORT_CREATE], "Error: No AIRPORT Create.");\
-strcpy(gszAirportErrors[ERROR_NULL_PTR_AIRPLANE], "Error: Null Pointer.");\
-strcpy(gszAirportErrors[ERROR_NO_AIRPORT_TERMINATE], "Error: No AIRPORT Terminate.");\
-strcpy(gszAirportErrors[ERROR_EMPTY_RUNWAY], "Error: Runway is Empty.");\
-strcpy(gszAirportErrors[ERROR_EMPTY_IN_FLIGHT_PQ], "Error: In Flight Priority Queue is Empty.");\
-strcpy(gszAirportErrors[ERROR_INVALID_AIRPORT], "Error: Invalid AIRPORT.");\
-strcpy(gszAirportErrors[ERROR_EMPTY_AIRPORT], "Error: Empty AIRPORT.");
+#define LOAD_AIRPORT_ERRORS strcpy(gszAirportErrors[NO_AIRPORT_ERROR] \
+		, "No Error.");\
+strcpy(gszAirportErrors[ERROR_NO_AIRPORT_CREATE] \
+		, "Error: No AIRPORT Create.");\
+strcpy(gszAirportErrors[ERROR_NULL_PTR_AIRPLANE] \
+		, "Error: Null Pointer.");\
+strcpy(gszAirportErrors[ERROR_NO_AIRPORT_TERMINATE] \
+		, "Error: No AIRPORT Terminate.");\
+strcpy(gszAirportErrors[ERROR_EMPTY_RUNWAY] \
+		, "Error: Runway is Empty.");\
+strcpy(gszAirportErrors[ERROR_EMPTY_IN_FLIGHT_PQ] \
+		, "Error: In Flight Priority Queue is Empty.");\
+strcpy(gszAirportErrors[ERROR_INVALID_AIRPORT] \
+		, "Error: Invalid AIRPORT.");\
+strcpy(gszAirportErrors[ERROR_EMPTY_AIRPORT] \
+		, "Error: Empty AIRPORT.");
 
 //*************************************************************************
 // User-defined types
@@ -85,24 +94,6 @@ extern void airportTerminate (AirportPtr);
 
 extern void airportLoadErrorMessages ();
 
-extern void airportReadLine (AirportPtr, FILE*, AirportStatsPtr);
-
-extern int airportRunwaySize (AirportPtr);
-
-extern int airportInFlightSize (AirportPtr);
-
-extern bool emptyAirportRunway (AirportPtr);
-
-extern bool emptyAirportInFlightPQ (AirportPtr);
-
-void airportIncrementTimer (AirportPtr);
-
-void airportPrintRow (AirportPtr, AirportStatsPtr);
-
-void updateAirport (AirportPtr, AirportStatsPtr);
-
-void decrementFuel (AirportPtr);
-
 //*************************************************************************
 //									Inserting and retrieving values
 //*************************************************************************
@@ -117,6 +108,32 @@ extern void dequeueInFlightPQ (AirportPtr, int*);
 
 extern int peekInFlightPQ (AirportPtr, int*);
 
-void setNextTurn (AirportPtr, AirportStatsPtr);
+void airportPrintRow (AirportPtr, AirportStatsPtr);
+
+//*************************************************************************
+//									Checking number of elements in priority queue
+//*************************************************************************
+
+extern int airportRunwaySize (AirportPtr);
+
+extern int airportInFlightSize (AirportPtr);
+
+extern bool emptyAirportRunway (AirportPtr);
+
+extern bool emptyAirportInFlightPQ (AirportPtr);
+
+//*************************************************************************
+//									Setting values in Airport for next turn
+//*************************************************************************
+
+extern void setNextTurn (AirportPtr, AirportStatsPtr);
+
+extern void updateAirport (AirportPtr, AirportStatsPtr);
+
+extern void decrementFuel (AirportPtr);
+
+extern void airportReadLine (AirportPtr, FILE*, AirportStatsPtr);
+
+extern void airportIncrementTimer (AirportPtr);
 
 #endif /* AIRPORT_H_ */

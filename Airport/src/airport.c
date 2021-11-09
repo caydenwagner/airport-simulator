@@ -103,6 +103,7 @@ void airportTerminate (AirportPtr psTheAirport)
 
  Parameters:		psTheAiport - the address of the airport
  	 	 	 	 	 	 	 	fPtr 				- a pointer to the read file
+ 	 	 	 	 	 	 	 	sStats			- a struct that contains key stats about the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -338,9 +339,9 @@ void dequeueInFlightPQ (AirportPtr psTheAirport, int* pBuf)
 								pBuf);
 }
 /**************************************************************************
- Function:
+ Function:			airportIncrementTimer
 
- Description:
+ Description:		Increments the airport timer by 1
 
  Parameters:		psTheAiport - the address of the airport
 
@@ -354,11 +355,12 @@ void airportIncrementTimer (AirportPtr psTheAirport) {
 	psTheAirport->timer++;
 }
 /**************************************************************************
- Function:
+ Function:			airportPrintRow
 
- Description:
+ Description:		Prints one turn of the Airport in the correct format
 
  Parameters:		psTheAiport - the address of the airport
+ 	 	 	 	 	 	 	 	sStats			- a struct that contains key stats about the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -415,11 +417,14 @@ void airportPrintRow (AirportPtr psTheAirport, AirportStatsPtr sStats)
 	printf("\n");
 }
 /**************************************************************************
- Function:
+ Function:			updateAirport
 
- Description:
+ Description:		Services planes that are in the air or ready for takeoff. Lands
+  							emergency planes with no fuel as the first priority, then moves
+  							on to whichever queue is larger
 
  Parameters:		psTheAiport - the address of the airport
+ 	 	 	 	 	 	 	  sStats			- a struct that contains key stats about the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -477,9 +482,9 @@ void updateAirport (AirportPtr psTheAirport, AirportStatsPtr sStats)
 	}
 }
 /**************************************************************************
- Function:
+ Function:			decrementFuel
 
- Description:
+ Description:		Decreases the fuel of all planes in the air by 1
 
  Parameters:		psTheAiport - the address of the airport
 
@@ -499,9 +504,9 @@ void decrementFuel (AirportPtr psTheAirport)
 	}
 }
 /**************************************************************************
- Function:
+ Function:			setNextTurn
 
- Description:
+ Description:		Sets key values back to initialized state
 
  Parameters:		psTheAiport - the address of the airport
 

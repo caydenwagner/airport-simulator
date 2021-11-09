@@ -1,10 +1,11 @@
 /**************************************************************************
- File name:
+ File name:	 airportDriver.c
  Author:		 Cayden Wagner
  Date:			 10/28/21
  Class:			 CS300
- Assignment:
- Purpose:
+ Assignment: Airport
+ Purpose:		 Design a program that can service airplanes that need to launch
+  					 and takeoff using priorityQueueADT and queueADT
  *************************************************************************/
 
 #include <stdio.h>
@@ -29,11 +30,14 @@ void printCol (int, char[], int);
 void printRow1 ();
 void printRow2 ();
 /****************************************************************************
- Function:
+ Function:		main
 
- Description:
+ Description:	Drives the Airplane simulator
 
- Returned:
+ Parameters:  argc - the count of command line args
+ 	 	 	 	 	 	 	argv - the command line args
+
+ Returned:    Exit status
  ****************************************************************************/
 int main (int argc, char **argv)
 {
@@ -79,24 +83,31 @@ int main (int argc, char **argv)
 	return 0;
 }
 /****************************************************************************
- Function:
+ Function:			printCol
 
- Description:
+ Description:		prints a header surrounded by specified buffer space
 
- Returned:
+ Parameters:		leftPadding - the amount of padding on the left of the header
+ 	 	 	 	 	 	 	 	header 			- the header of the column
+ 	 	 	 	 	 	 	 	rightPadding - the amount of padding on the right of the header
+
+ Returned:			none
  ****************************************************************************/
-void printCol (int leftBuf, char header[], int rightBuf)
+void printCol (int leftPadding, char header[], int rightPadding)
 {
-	printf("%*s", leftBuf, header);
+	printf("%*s", leftPadding, header);
 
-	printChar(BUFFER, rightBuf);
+	printChar(BUFFER, rightPadding);
 }
 /****************************************************************************
- Function:
+ Function:		printHeader
 
- Description:
+ Description:	calls printRow functions and printDivider functions to print the
+  						header in the correct format
 
- Returned:
+ Parameters:  None
+
+ Returned:		None
  ****************************************************************************/
 void printHeader ()
 {
@@ -105,11 +116,14 @@ void printHeader ()
 	printDivider ();
 }
 /****************************************************************************
- Function:
+ Function:		printChar
 
- Description:
+ Description: prints a specified char a certain number of times
 
- Returned:
+ Parameters:	character - the char that is printed
+ 	 	 	 	 	 	 	num 			- how many times the char is printed
+
+ Returned:		none
  ****************************************************************************/
 void printChar(char character, int num)
 {
@@ -119,11 +133,13 @@ void printChar(char character, int num)
 	}
 }
 /****************************************************************************
- Function:
+ Function:		printDivider
 
- Description:
+ Description:	prints a divided of char '-' in the correct format
 
- Returned:
+ Parameters:  None
+
+ Returned:		None
  ****************************************************************************/
 void printDivider ()
 {
@@ -149,11 +165,13 @@ void printDivider ()
 	printf("\n");
 }
 /****************************************************************************
- Function:
+ Function:		printRow1
 
- Description:
+ Description:	prints the first for in the correct format
 
- Returned:
+ Parameters: 	Calls printCol functions to print a row in the correct format
+
+ Returned:		None
  ****************************************************************************/
 void printRow1 ()
 {
@@ -178,11 +196,13 @@ void printRow1 ()
 	printf("\n");
 }
 /****************************************************************************
- Function:
+ Function:		printRow2
 
- Description:
+ Description:	prints the first for in the correct format
 
- Returned:
+ Parameters: 	Calls printCol functions to print a row in the correct format
+
+ Returned:		None
  ****************************************************************************/
 void printRow2 ()
 {
