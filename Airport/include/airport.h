@@ -99,6 +99,10 @@ void airportIncrementTimer (AirportPtr);
 
 void airportPrintRow (AirportPtr, AirportStatsPtr);
 
+void updateAirport (AirportPtr, AirportStatsPtr);
+
+void decrementFuel (AirportPtr);
+
 //*************************************************************************
 //									Inserting and retrieving values
 //*************************************************************************
@@ -112,5 +116,7 @@ extern void dequeueRunway (AirportPtr);
 extern void dequeueInFlightPQ (AirportPtr, int*);
 
 extern int peekInFlightPQ (AirportPtr, int*);
+
+void setNextTurn (AirportPtr, AirportStatsPtr);
 
 #endif /* AIRPORT_H_ */

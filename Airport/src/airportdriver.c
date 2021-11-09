@@ -50,7 +50,7 @@ int main (int argc, char **argv)
 
 	fPtr = fopen(argv[1], "r");
 
-	if (fPtr == NULL)
+	if (NULL == fPtr)
 	{
 		printf("Error! File not found\n\n");
 		EXIT_FAILURE;
@@ -59,14 +59,19 @@ int main (int argc, char **argv)
 	printHeader();
 	airportCreate(&sTheAirport);
 
-	while (!feof(fPtr))
+	do
 	{
-		airportReadLine(&sTheAirport, fPtr, &sStats);
-
+		if (!feof(fPtr))
+		{
+			airportReadLine(&sTheAirport, fPtr, &sStats);
+		}
+		decrementFuel(&sTheAirport);
+		updateAirport(&sTheAirport, &sStats);
 		airportPrintRow(&sTheAirport, &sStats);
-
 		airportIncrementTimer(&sTheAirport);
-	}
+		setNextTurn(&sTheAirport, &sStats);
+	}	while (!(emptyAirportRunway(&sTheAirport)) ||
+			 (!(emptyAirportInFlightPQ(&sTheAirport))));
 
 	fclose(fPtr);
 	airportTerminate(&sTheAirport);

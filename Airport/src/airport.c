@@ -11,7 +11,8 @@
 #include <stdbool.h>
 #include "../include/airport.h"
 
-const char EMPTY_RUNWAY = 'E';
+const char EMPTY_RUNWAY = '-';
+const char EMERGENCY_RUNWAY = 'E';
 const char LANDING_RUNWAY = 'L';
 const char TAKEOFF_RUNWAY = 'T';
 const int MAX_RUNWAYS = 3;
@@ -304,7 +305,7 @@ void dequeueRunway (AirportPtr psTheAirport)
 	{
 		processError("dequeueRunway", ERROR_INVALID_AIRPORT);
 	}
-	if (emptyAirportInFlightPQ(psTheAirport))
+	if (emptyAirportRunway(psTheAirport))
 	{
 		processError("dequeueRunway", ERROR_EMPTY_RUNWAY);
 	}
@@ -365,7 +366,7 @@ void airportPrintRow (AirportPtr psTheAirport, AirportStatsPtr sStats)
 {
 	if (NULL == psTheAirport)
 	{
-		processError("AirportPrintTimer", ERROR_INVALID_AIRPORT);
+		processError("AirportPrintRow", ERROR_INVALID_AIRPORT);
 	}
 	const int EMPTY = -1;
 	const char EMPTY_CHAR = '-';
@@ -373,6 +374,10 @@ void airportPrintRow (AirportPtr psTheAirport, AirportStatsPtr sStats)
 	const int COL_2_SPACES = 7;
 	const int COL_3_SPACES = 9;
 	const int COL_4_SPACES = 5;
+	const int COL_6_SPACES = 3;
+	const int COL_7_SPACES = 6;
+	const int COL_8_SPACES = 7;
+	const int COL_9_SPACES = 9;
 
 	fprintf(stdout, "%*d", COL_1_SPACES, psTheAirport->timer);
 	printf(" | ");
@@ -392,9 +397,128 @@ void airportPrintRow (AirportPtr psTheAirport, AirportStatsPtr sStats)
 		}
 	}
 
+	printf(" |");
+
+	for(int i = 0; i < MAX_PLANES; i++)
+	{
+		printf("%*c ", COL_6_SPACES, psTheAirport->aRunwayStatus[i]);
+	}
+
+	printf("%*d", COL_7_SPACES, psTheAirport->crashCount);
+
 	printf(" | ");
 
+	printf("%*d", COL_8_SPACES, airportRunwaySize(psTheAirport));
+	printf("%*d", COL_9_SPACES, airportInFlightSize(psTheAirport));
+
+
 	printf("\n");
+}
+/**************************************************************************
+ Function:
 
+ Description:
 
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		None
+ *************************************************************************/
+void updateAirport (AirportPtr psTheAirport, AirportStatsPtr sStats)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("updateAirport", ERROR_INVALID_AIRPORT);
+	}
+
+	bool bEmergency = true, bEmpty = false;
+	int runwaysTaken = 0;
+	int fuel;
+
+	while(bEmergency && MAX_PLANES > runwaysTaken &&
+			 (!(emptyAirportInFlightPQ(psTheAirport))))
+	{
+		peekInFlightPQ(psTheAirport, &fuel);
+		if (fuel < 0)
+		{
+			psTheAirport->crashCount++;
+			dequeueInFlightPQ(psTheAirport, &fuel);
+		}
+		else if(0 == fuel)
+		{
+			dequeueInFlightPQ(psTheAirport, &fuel);
+			psTheAirport->aRunwayStatus[runwaysTaken] = EMERGENCY_RUNWAY;
+			runwaysTaken++;
+		}
+		else
+		{
+			bEmergency = false;
+		}
+	}
+
+	while (MAX_PLANES > runwaysTaken && !bEmpty)
+	{
+		if (airportRunwaySize(psTheAirport) > airportInFlightSize(psTheAirport) &&
+				(!(emptyAirportRunway(psTheAirport))))
+		{
+			dequeueRunway(psTheAirport);
+			psTheAirport->aRunwayStatus[runwaysTaken] = TAKEOFF_RUNWAY;
+			runwaysTaken++;
+		}
+		else if ((!(emptyAirportInFlightPQ(psTheAirport))))
+		{
+			dequeueInFlightPQ(psTheAirport, &fuel);
+			psTheAirport->aRunwayStatus[runwaysTaken] = LANDING_RUNWAY;
+			runwaysTaken++;
+		}
+		else
+		{
+			bEmpty = true;
+		}
+	}
+}
+/**************************************************************************
+ Function:
+
+ Description:
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		None
+ *************************************************************************/
+void decrementFuel (AirportPtr psTheAirport)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("decrementFuel", ERROR_INVALID_AIRPORT);
+	}
+	const int PRIORITY_CHANGE = -1;
+
+	if (!(emptyAirportInFlightPQ(psTheAirport)))
+	{
+		pqueueChangePriority(&(psTheAirport->sInFlightPQueue), PRIORITY_CHANGE);
+	}
+}
+/**************************************************************************
+ Function:
+
+ Description:
+
+ Parameters:		psTheAiport - the address of the airport
+
+ Returned:	 		None
+ *************************************************************************/
+void setNextTurn (AirportPtr psTheAirport, AirportStatsPtr psStats)
+{
+	if (NULL == psTheAirport)
+	{
+		processError("setNextTurn", ERROR_INVALID_AIRPORT);
+	}
+
+	psTheAirport->crashCount = 0;
+	psStats->Takeoff = 0;
+	psStats->Landing = 0;
+	for (int i = 0; i < MAX_PLANES; i++)
+	{
+		psTheAirport->aRunwayStatus[i] = EMPTY_RUNWAY;
+	}
 }
