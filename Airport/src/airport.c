@@ -57,7 +57,9 @@ void airportLoadErrorMessages ()
  Description:		creates the airport by initializing the runway queue and
  	 	 	 	 	 	 	 	the in flight priority queue
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
+ 	 	 	 	 	 	 	 	psStats			 - a pointer to the AirportStats struct that stores
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 key data about the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -66,6 +68,10 @@ void airportCreate (AirportPtr psTheAirport, AirportStatsPtr psStats)
 	if (NULL == psTheAirport)
 	{
 		processError("airportCreate", ERROR_NO_AIRPORT_CREATE);
+	}
+	if (NULL == psStats)
+	{
+		processError("airportCreate", ERROR_NULL_PTR_AIRPORT_STATS);
 	}
 	queueCreate(&(psTheAirport->sRunwayQueue));
 	pqueueCreate(&(psTheAirport->sInFlightPQueue));
@@ -89,7 +95,7 @@ void airportCreate (AirportPtr psTheAirport, AirportStatsPtr psStats)
  Description:		terminates the airport by terminating the runway queue and
  	 	 	 	 	 	 	 	the in flight priority queue
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -108,15 +114,28 @@ void airportTerminate (AirportPtr psTheAirport)
  Description:		reads a line from a file and updates the the runway queue and
  	 	 	 	 	 	 	 	the in flight priority queue using the data read
 
- Parameters:		psTheAiport - the address of the airport
- 	 	 	 	 	 	 	 	fPtr 				- a pointer to the read file
- 	 	 	 	 	 	 	 	sStats			- a struct that contains key stats about the airport
+ Parameters:		psTheAirport - the address of the airport
+ 	 	 	 	 	 	 	 	fPtr 				 - a pointer to the read file
+ 	 	 	 	 	 	 	 	psStats			 - a pointer to the AirportStats struct that stores
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 key data about the airport
 
  Returned:	 		None
  *************************************************************************/
 void airportReadLine (AirportPtr psTheAirport, FILE *fPtr,
-											AirportStatsPtr sStats)
+											AirportStatsPtr psStats)
 {
+	if (NULL == psTheAirport)
+	{
+		processError("airportReadLine", ERROR_NULL_PTR_AIRPORT);
+	}
+	if (NULL == fPtr)
+	{
+		processError("airportReadLine", ERROR_NULL_FILE_PTR);
+	}
+	if (NULL == psStats)
+	{
+		processError("airportReadLine", ERROR_NULL_PTR_AIRPORT_STATS);
+	}
 	const int MAX_NUM_PLANES = 3;
 	const int EMPTY = -1;
 	int numTakeoffPlanes = 0, numLandingPlanes = 0;
@@ -124,14 +143,14 @@ void airportReadLine (AirportPtr psTheAirport, FILE *fPtr,
 
 	for (int i = 0; i < MAX_NUM_PLANES; i++)
 	{
-		sStats->aFuelRemaining[i] = EMPTY;
+		psStats->aFuelRemaining[i] = EMPTY;
 	}
 
 	fscanf(fPtr,"%d", &numTakeoffPlanes);
 	fscanf(fPtr,"%d", &numLandingPlanes);
 
-	sStats->currentNumLanding = numLandingPlanes;
-	sStats->currentNumTakeoff = numTakeoffPlanes;
+	psStats->currentNumLanding = numLandingPlanes;
+	psStats->currentNumTakeoff = numTakeoffPlanes;
 
 	for (int i = 0; i < numTakeoffPlanes; i++)
 	{
@@ -150,7 +169,7 @@ void airportReadLine (AirportPtr psTheAirport, FILE *fPtr,
 
 	for (int i = 0; i < numLandingPlanes; i++)
 	{
-		sStats->aFuelRemaining[i] = aFuel[i];
+		psStats->aFuelRemaining[i] = aFuel[i];
 	}
 }
 /**************************************************************************
@@ -158,7 +177,7 @@ void airportReadLine (AirportPtr psTheAirport, FILE *fPtr,
 
  Description:		enqueues an airplane into the runway queue
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -178,9 +197,9 @@ void enqueueRunway(AirportPtr psTheAirport)
 
  Description:		enqueues the in flight priority queue
 
- Parameters:		psTheAiport - the address of the airport
- 	 	 	 	 	 	 	 	fuel 				- the fuel of the queued airplane, used as the
- 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	priority in the in flight priority queue
+ Parameters:		psTheAirport - the address of the airport
+ 	 	 	 	 	 	 	 	fuel 				 - the fuel of the queued airplane, used as the
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 priority in the in flight priority queue
 
  Returned:	 		None
  *************************************************************************/
@@ -202,7 +221,7 @@ void enqueueInFlightPQ (AirportPtr psTheAirport, int fuel)
 
  Description:		returns the size of the airport runway queue
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
 
  Returned:	 		an integer value that is the number of elements in the
  	 	 	 	 	 	 	 	runway queue
@@ -220,7 +239,7 @@ int airportRunwaySize (AirportPtr psTheAirport)
 
  Description:		returns the size of the airport in flight priority queue
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
 
  Returned:	 		an integer value that is the number of elements in the
  	 	 	 	 	 	 	 	in flight priority queue
@@ -239,7 +258,11 @@ int airportInFlightSize (AirportPtr psTheAirport)
  Description:		checks the priority of the first element in the in flight
   							priority queue
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
+ 	 	 	 	 	 	 	 	pFuel				 - space to store the fuel of the top plane in the
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 priority queue
+ 	 	 	 	 	 	 	 	pTimer			 - space to store the integer timer of the top plane
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 in the priority queue
 
  Returned:	 		a pointer to the highest priority airplane
  *************************************************************************/
@@ -251,11 +274,11 @@ Airplane peekInFlightPQ (AirportPtr psTheAirport, int* pFuel, int* pTimer)
 	}
 	if (NULL == pFuel)
 	{
-		processError("peekInFlightPQ", ERROR_NULL_PTR_AIRPLANE);
+		processError("peekInFlightPQ", ERROR_NULL_PTR_AIRPORT);
 	}
 	if (NULL == pTimer)
 	{
-		processError("peekInFlightPQ", ERROR_NULL_PTR_AIRPLANE);
+		processError("peekInFlightPQ", ERROR_NULL_PTR_AIRPORT);
 	}
 	if (emptyAirportInFlightPQ(psTheAirport))
 	{
@@ -273,7 +296,9 @@ Airplane peekInFlightPQ (AirportPtr psTheAirport, int* pFuel, int* pTimer)
 
  Description:		checks the airplane at the front of the runway queue
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
+ 	 	 	 	 	 	 	  pTimer 			 - Space to store the timer integer of the dequeued
+ 	 	 	 	 	 	 	   	 	 	 	 	 	   plane
 
  Returned:	 		the airplane at the front of the queue
  *************************************************************************/
@@ -285,11 +310,11 @@ Airplane peekRunway (AirportPtr psTheAirport, int* pTimer)
 	}
 	if (NULL == pTimer)
 	{
-		processError("peekRunway", ERROR_NULL_PTR_AIRPLANE);
+		processError("peekRunway", ERROR_NULL_PTR_AIRPORT);
 	}
 	if (emptyAirportRunway(psTheAirport))
 	{
-		processError("peekRunway", ERROR_EMPTY_IN_FLIGHT_PQ);
+		processError("peekRunway", ERROR_EMPTY_RUNWAY);
 	}
 	Airplane sAirplane;
 	queuePeek(&(psTheAirport->sRunwayQueue), &sAirplane, sizeof(Airplane));
@@ -302,7 +327,7 @@ Airplane peekRunway (AirportPtr psTheAirport, int* pTimer)
 
  Description:		checks if the runway is empty or not
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
 
  Returned:	 		true if the runway queue contains 0 elements, else false
  *************************************************************************/
@@ -320,7 +345,7 @@ bool emptyAirportRunway (AirportPtr psTheAirport)
 
  Description:		checks if the in flight priority queue is empty or not
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
 
  Returned:	 		true if the priority queue contains 0 elements, else false
  *************************************************************************/
@@ -338,7 +363,7 @@ bool emptyAirportInFlightPQ (AirportPtr psTheAirport)
 
  Description:		dequeues the first element in the runway queue
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -361,7 +386,9 @@ void dequeueRunway (AirportPtr psTheAirport)
  Description:		dequeues the highest priority element in the in flight
  	 	 	 	 	 	 	 	priority queue
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
+ 	 	 	 	 	 	 	 	pBuf 				 - Buffer space to store the priority of the
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	dequeued plane
 
  Returned:	 		None
  *************************************************************************/
@@ -375,6 +402,10 @@ void dequeueInFlightPQ (AirportPtr psTheAirport, int* pBuf)
 	{
 		processError("dequeueInFlightPQ", ERROR_EMPTY_IN_FLIGHT_PQ);
 	}
+	if (NULL == pBuf)
+	{
+		processError("dequeueInFlightPQ", ERROR_NULL_PTR_AIRPORT);
+	}
 	Airplane sAirplane;
 
 	pqueueDequeue(&(psTheAirport->sInFlightPQueue), &sAirplane, sizeof(Airplane),
@@ -385,7 +416,7 @@ void dequeueInFlightPQ (AirportPtr psTheAirport, int* pBuf)
 
  Description:		Increments the airport timer by 1
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -401,16 +432,21 @@ void airportIncrementTimer (AirportPtr psTheAirport) {
 
  Description:		Prints one turn of the Airport in the correct format
 
- Parameters:		psTheAiport - the address of the airport
- 	 	 	 	 	 	 	 	sStats			- a struct that contains key stats about the airport
+ Parameters:		psTheAirport - the address of the airport
+ 	 	 	 	 	 	 	 	psStats			 - a pointer to the AirportStats struct that stores
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 key data about the airport
 
  Returned:	 		None
  *************************************************************************/
-void airportPrintRow (AirportPtr psTheAirport, AirportStatsPtr sStats)
+void airportPrintRow (AirportPtr psTheAirport, AirportStatsPtr psStats)
 {
 	if (NULL == psTheAirport)
 	{
 		processError("AirportPrintRow", ERROR_INVALID_AIRPORT);
+	}
+	if (NULL == psStats)
+	{
+		processError("AirportPrintRow", ERROR_NULL_PTR_AIRPORT_STATS);
 	}
 	const int EMPTY = -1;
 	const char EMPTY_CHAR = '-';
@@ -425,19 +461,19 @@ void airportPrintRow (AirportPtr psTheAirport, AirportStatsPtr sStats)
 
 	fprintf(stdout, "%*d", COL_1_SPACES, psTheAirport->timer);
 	printf(" | ");
-	printf("%*d", COL_2_SPACES, sStats->currentNumTakeoff);
-	printf("%*d", COL_3_SPACES, sStats->currentNumLanding);
+	printf("%*d", COL_2_SPACES, psStats->currentNumTakeoff);
+	printf("%*d", COL_3_SPACES, psStats->currentNumLanding);
 	printf(" |");
 
 	for (int i = 0; i < MAX_PLANES; i++)
 	{
-		if (EMPTY == sStats->aFuelRemaining[i])
+		if (EMPTY == psStats->aFuelRemaining[i])
 		{
 			printf("%*c", COL_4_SPACES, EMPTY_CHAR);
 		}
 		else
 		{
-			printf("%*d", COL_4_SPACES, sStats->aFuelRemaining[i]);
+			printf("%*d", COL_4_SPACES, psStats->aFuelRemaining[i]);
 		}
 	}
 
@@ -465,16 +501,21 @@ void airportPrintRow (AirportPtr psTheAirport, AirportStatsPtr sStats)
   							emergency planes with no fuel as the first priority, then moves
   							on to whichever queue is larger
 
- Parameters:		psTheAiport - the address of the airport
- 	 	 	 	 	 	 	  sStats			- a struct that contains key stats about the airport
+ Parameters:		psTheAirport - the address of the airport
+ 	 	 	 	 	 	 	  psStats			 - a pointer to the AirportStats struct that stores
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 key data about the airport
 
  Returned:	 		None
  *************************************************************************/
-void updateAirport (AirportPtr psTheAirport, AirportStatsPtr sStats)
+void updateAirport (AirportPtr psTheAirport, AirportStatsPtr psStats)
 {
 	if (NULL == psTheAirport)
 	{
 		processError("updateAirport", ERROR_INVALID_AIRPORT);
+	}
+	if (NULL == psStats)
+	{
+		processError("updateAirport", ERROR_NULL_PTR_AIRPORT_STATS);
 	}
 
 	bool bEmergency = true, bEmpty = false;
@@ -489,19 +530,19 @@ void updateAirport (AirportPtr psTheAirport, AirportStatsPtr sStats)
 		if (fuel < 0)
 		{
 			psTheAirport->crashCount++;
-			sStats->numCrashes++;
+			psStats->numCrashes++;
 			dequeueInFlightPQ(psTheAirport, &fuel);
-			sStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
-			sStats->totalTimeRemaining += fuel;
+			psStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
+			psStats->totalTimeRemaining += fuel;
 		}
 		else if (0 == fuel)
 		{
 			dequeueInFlightPQ(psTheAirport, &fuel);
 			psTheAirport->aRunwayStatus[runwaysTaken] = EMERGENCY_RUNWAY;
 			runwaysTaken++;
-			sStats->numPlanesWithNoFuel++;
-			sStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
-			sStats->totalTimeRemaining += fuel;
+			psStats->numPlanesWithNoFuel++;
+			psStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
+			psStats->totalTimeRemaining += fuel;
 		}
 		else
 		{
@@ -518,7 +559,7 @@ void updateAirport (AirportPtr psTheAirport, AirportStatsPtr sStats)
 			dequeueRunway(psTheAirport);
 			psTheAirport->aRunwayStatus[runwaysTaken] = TAKEOFF_RUNWAY;
 			runwaysTaken++;
-			sStats->totalTakeoffWait += psTheAirport->timer - sTemp.entryTimer + 1;
+			psStats->totalTakeoffWait += psTheAirport->timer - sTemp.entryTimer + 1;
 		}
 		else if ((!(emptyAirportInFlightPQ(psTheAirport))))
 		{
@@ -526,8 +567,8 @@ void updateAirport (AirportPtr psTheAirport, AirportStatsPtr sStats)
 			dequeueInFlightPQ(psTheAirport, &fuel);
 			psTheAirport->aRunwayStatus[runwaysTaken] = LANDING_RUNWAY;
 			runwaysTaken++;
-			sStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
-			sStats->totalTimeRemaining += fuel;
+			psStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
+			psStats->totalTimeRemaining += fuel;
 		}
 		else
 		{
@@ -540,7 +581,7 @@ void updateAirport (AirportPtr psTheAirport, AirportStatsPtr sStats)
 
  Description:		Decreases the fuel of all planes in the air by 1
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -562,7 +603,9 @@ void decrementFuel (AirportPtr psTheAirport)
 
  Description:		Sets key values back to initialized state
 
- Parameters:		psTheAiport - the address of the airport
+ Parameters:		psTheAirport - the address of the airport
+ 	 	 	 	 	 	 	 	psStats			- a pointer to the AirportStats struct that stores
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	key data about the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -572,12 +615,17 @@ void setNextTurn (AirportPtr psTheAirport, AirportStatsPtr psStats)
 	{
 		processError("setNextTurn", ERROR_INVALID_AIRPORT);
 	}
+	if (NULL == psStats)
+	{
+		processError("setNextTurn", ERROR_NULL_PTR_AIRPORT_STATS);
+	}
 
 	psTheAirport->crashCount = 0;
 	psStats->totalNumTakeoff += psStats->currentNumTakeoff;
 	psStats->totalNumLanding += psStats->currentNumLanding;
 	psStats->currentNumTakeoff = 0;
 	psStats->currentNumLanding = 0;
+
 	for (int i = 0; i < MAX_PLANES; i++)
 	{
 		psTheAirport->aRunwayStatus[i] = EMPTY_RUNWAY;

@@ -26,7 +26,9 @@
 
 enum {NO_AIRPORT_ERROR = 0,
 			ERROR_NO_AIRPORT_CREATE,
-			ERROR_NULL_PTR_AIRPLANE,
+			ERROR_NULL_PTR_AIRPORT,
+			ERROR_NULL_FILE_PTR,
+			ERROR_NULL_PTR_AIRPORT_STATS,
 			ERROR_INVALID_AIRPORT,
 			ERROR_EMPTY_RUNWAY,
 			ERROR_EMPTY_IN_FLIGHT_PQ,
@@ -41,8 +43,12 @@ enum {NO_AIRPORT_ERROR = 0,
 		, "No Error.");\
 strcpy(gszAirportErrors[ERROR_NO_AIRPORT_CREATE] \
 		, "Error: No AIRPORT Create.");\
-strcpy(gszAirportErrors[ERROR_NULL_PTR_AIRPLANE] \
+strcpy(gszAirportErrors[ERROR_NULL_PTR_AIRPORT] \
 		, "Error: Null Pointer.");\
+strcpy(gszAirportErrors[ERROR_NULL_PTR_AIRPORT_STATS] \
+		, "Error: Null Airport Stats.");\
+strcpy(gszAirportErrors[ERROR_NULL_FILE_PTR] \
+		, "Error: Null File Pinter.");\
 strcpy(gszAirportErrors[ERROR_NO_AIRPORT_TERMINATE] \
 		, "Error: No AIRPORT Terminate.");\
 strcpy(gszAirportErrors[ERROR_EMPTY_RUNWAY] \

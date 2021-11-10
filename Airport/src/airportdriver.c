@@ -18,8 +18,8 @@
 
 const char BUFFER = ' ';
 const char DIVIDER = '-';
-char *ROW1[] = {"Planes Added", "Runways", "Queue", "Lengths"};
-char *ROW2[] = {"Time", "Takeoff  Landing (Fuel Remaining)", "1   2   3  Crash",
+char *paRow1[] = {"Planes Added", "Runways", "Queue", "Lengths"};
+char *paRow2[] = {"Time", "Takeoff  Landing (Fuel Remaining)", "1   2   3  Crash",
 								"Takeoff", "Landing"};
 
 
@@ -78,8 +78,6 @@ int main (int argc, char **argv)
 		setNextTurn(&sTheAirport, &sStats);
 	}	while ((!(emptyAirportRunway(&sTheAirport)) ||
 			 (!(emptyAirportInFlightPQ(&sTheAirport)))) || (!feof(fPtr)));
-
-
 
 	fclose(fPtr);
 
@@ -151,7 +149,7 @@ void printDivider ()
 {
 	const int THREE_SPACES = 3;
 
-	printChar(DIVIDER, strlen(ROW2[0]));
+	printChar(DIVIDER, strlen(paRow2[0]));
 	printf(" | ");
 	printChar(DIVIDER, strlen("Takeoff"));
 	printf("  ");
@@ -193,12 +191,12 @@ void printRow1 ()
 
 	printCol(COL_1_WIDTH, "", 0);
 	printf("|");
-	printCol(COL_2_WIDTH, ROW1[0], COL_2_BUFFER);
+	printCol(COL_2_WIDTH, paRow1[0], COL_2_BUFFER);
 	printf("|");
-	printCol(COL_3_WIDTH, ROW1[1], COL_3_BUFFER);
+	printCol(COL_3_WIDTH, paRow1[1], COL_3_BUFFER);
 	printf("|");
-	printCol(COL_4_WIDTH, ROW1[2], COL_4_BUFFER);
-	printCol(COL_5_WIDTH, ROW1[3], COL_5_BUFFER);
+	printCol(COL_4_WIDTH, paRow1[2], COL_4_BUFFER);
+	printCol(COL_5_WIDTH, paRow1[3], COL_5_BUFFER);
 	printf("\n");
 }
 /****************************************************************************
@@ -222,23 +220,24 @@ void printRow2 ()
 	const int COL_4_BUFFER = 1;
 
 
-	printCol(COL_1_WIDTH, ROW2[0], COL_1_BUFFER);
+	printCol(COL_1_WIDTH, paRow2[0], COL_1_BUFFER);
 	printf("|");
-	printCol(COL_2_WIDTH, ROW2[1], COL_2_BUFFER);
+	printCol(COL_2_WIDTH, paRow2[1], COL_2_BUFFER);
 	printf("|");
-	printCol(COL_3_WIDTH, ROW2[2], COL_3_BUFFER);
+	printCol(COL_3_WIDTH, paRow2[2], COL_3_BUFFER);
 	printf("|");
-	printCol(COL_4_WIDTH, ROW2[3], COL_4_BUFFER);
-	printCol(COL_4_WIDTH, ROW2[4], 0);
+	printCol(COL_4_WIDTH, paRow2[3], COL_4_BUFFER);
+	printCol(COL_4_WIDTH, paRow2[4], 0);
 
 	printf("\n");
 }
 /****************************************************************************
- Function:
+ Function:		calculateStats
 
- Description:
+ Description:	Runs calculations in the AirportStats and prints key information
 
- Parameters:
+ Parameters:	psStats - a pointer to a struct containing key stats about the
+  											airport
 
  Returned:		None
  ****************************************************************************/
