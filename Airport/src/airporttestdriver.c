@@ -4,7 +4,8 @@
  Date:			 10/27/21
  Class:			 CS300
  Assignment: airport
- Purpose:
+ Purpose:		 To test airport functions and print several success messages to
+ 	 	 	 	 	 	 easily spot errors
  *************************************************************************/
 
 #include <stdio.h>
@@ -147,7 +148,7 @@ int main (int argc, char **argv)
 
 //	airportReadLine (NULL, fPtr, &sStats);
 //	airportReadLine (&sTheAirport, NULL, &sStats);
-	airportReadLine (&sTheAirport, fPtr, NULL);
+//	airportReadLine (&sTheAirport, fPtr, NULL);
 
 //	airportIncrementTimer (AirportPtr);
 

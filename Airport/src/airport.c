@@ -28,7 +28,7 @@ char gszAirportErrors[NUMBER_OF_AIRPORT_ERRORS][MAX_ERROR_AIRPORT_CHARS];
 
  Returned:	 		None
  *************************************************************************/
-void processError (const char *pszFunctionName, int errorCode)
+static void processError (const char *pszFunctionName, int errorCode)
 {
 	printf ("Function: %s %s \n ", pszFunctionName,
 			gszAirportErrors [errorCode]);

@@ -14,8 +14,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "../../PriorityQueueADT/include/pqueue.h"
 #include "../../QueueADT/include/queue.h"
-#include "../../ListADT/include/list.h"
 
 //*************************************************************************
 // Constants

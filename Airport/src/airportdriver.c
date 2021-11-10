@@ -58,7 +58,7 @@ int main (int argc, char **argv)
 		if (NULL == fPtr)
 		{
 			printf("Error! File not found\n\n");
-			EXIT_FAILURE;
+			return EXIT_FAILURE;
 		}
 	}
 
