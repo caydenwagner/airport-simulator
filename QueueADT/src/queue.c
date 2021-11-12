@@ -10,7 +10,6 @@
 #include <string.h>
 #include <stdbool.h>
 #include "../include/queue.h"
-#include "../../PriorityQueueADT/src/pqueue.c"
 
 char gszQErrors[NUMBER_OF_LIST_ERRORS][MAX_ERROR_LIST_CHARS];
 /**************************************************************************
@@ -26,6 +25,22 @@ char gszQErrors[NUMBER_OF_LIST_ERRORS][MAX_ERROR_LIST_CHARS];
 void queueLoadErrorMessages ()
 {
 	LOAD_Q_ERRORS
+}
+/**************************************************************************
+ Function: 	 		processError
+
+ Description:   Process the error code passed to this routine
+
+ Parameters:		pszFunctionName - function causing the error
+ 	 	 	 					errorCode 	    - identifies the list error
+
+ Returned:	 		None
+ *************************************************************************/
+static void processError (const char *pszFunctionName, int errorCode)
+{
+	printf ("Function: %s %s \n ", pszFunctionName,
+			gszQErrors [errorCode]);
+  exit (EXIT_FAILURE);
 }
 /**************************************************************************
  Function:			queueCreate

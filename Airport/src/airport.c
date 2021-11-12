@@ -527,15 +527,7 @@ void updateAirport (AirportPtr psTheAirport, AirportStatsPtr psStats)
 			 (!(emptyAirportInFlightPQ(psTheAirport))))
 	{
 		sTemp = peekInFlightPQ(psTheAirport, &fuel, &entryTimer);
-		if (fuel < 0)
-		{
-			psTheAirport->crashCount++;
-			psStats->numCrashes++;
-			dequeueInFlightPQ(psTheAirport, &fuel);
-			psStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
-			psStats->totalTimeRemaining += fuel;
-		}
-		else if (0 == fuel)
+		if (fuel <= 0)
 		{
 			dequeueInFlightPQ(psTheAirport, &fuel);
 			psTheAirport->aRunwayStatus[runwaysTaken] = EMERGENCY_RUNWAY;
@@ -575,6 +567,24 @@ void updateAirport (AirportPtr psTheAirport, AirportStatsPtr psStats)
 			bEmpty = true;
 		}
 	}
+
+	if (!(emptyAirportInFlightPQ(psTheAirport)))
+	{
+		sTemp = peekInFlightPQ(psTheAirport, &fuel, &entryTimer);
+
+		while (fuel <= 0 && (!(emptyAirportInFlightPQ(psTheAirport))))
+		{
+			psTheAirport->crashCount++;
+			psStats->numCrashes++;
+			dequeueInFlightPQ(psTheAirport, &fuel);
+			psStats->totalLandingWait += psTheAirport->timer - sTemp.entryTimer + 1;
+			psStats->totalTimeRemaining += fuel;
+			if (!(emptyAirportInFlightPQ(psTheAirport)))
+			{
+				sTemp = peekInFlightPQ(psTheAirport, &fuel, &entryTimer);
+			}
+		}
+	}
 }
 /**************************************************************************
  Function:			decrementFuel
@@ -604,8 +614,8 @@ void decrementFuel (AirportPtr psTheAirport)
  Description:		Sets key values back to initialized state
 
  Parameters:		psTheAirport - the address of the airport
- 	 	 	 	 	 	 	 	psStats			- a pointer to the AirportStats struct that stores
- 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	key data about the airport
+ 	 	 	 	 	 	 	 	psStats			 - a pointer to the AirportStats struct that stores
+ 	 	 	 	 	 	 	 	 	 	 	 	 	 	   key data about the airport
 
  Returned:	 		None
  *************************************************************************/
@@ -620,6 +630,8 @@ void setNextTurn (AirportPtr psTheAirport, AirportStatsPtr psStats)
 		processError("setNextTurn", ERROR_NULL_PTR_AIRPORT_STATS);
 	}
 
+	const int EMPTY_PLANE = -1;
+
 	psTheAirport->crashCount = 0;
 	psStats->totalNumTakeoff += psStats->currentNumTakeoff;
 	psStats->totalNumLanding += psStats->currentNumLanding;
@@ -629,5 +641,6 @@ void setNextTurn (AirportPtr psTheAirport, AirportStatsPtr psStats)
 	for (int i = 0; i < MAX_PLANES; i++)
 	{
 		psTheAirport->aRunwayStatus[i] = EMPTY_RUNWAY;
+		psStats->aFuelRemaining[i] = EMPTY_PLANE;
 	}
 }

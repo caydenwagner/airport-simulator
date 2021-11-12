@@ -19,8 +19,8 @@
 const char BUFFER = ' ';
 const char DIVIDER = '-';
 char *paRow1[] = {"Planes Added", "Runways", "Queue", "Lengths"};
-char *paRow2[] = {"Time", "Takeoff  Landing (Fuel Remaining)", "1   2   3  Crash",
-								"Takeoff", "Landing"};
+char *paRow2[] = {"Time", "Takeoff  Landing (Fuel Remaining)",
+									"1   2   3  Crash", "Takeoff", "Landing"};
 
 
 void printHeader ();
@@ -42,9 +42,11 @@ void calculateStats (AirportStatsPtr);
  ****************************************************************************/
 int main (int argc, char **argv)
 {
+	const int HEADER_PRINT = 20;
 	Airport sTheAirport;
 	AirportStats sStats;
 	FILE *fPtr;
+	int counter = 0;
 
 	airportLoadErrorMessages ();
 	if (!(argc > 0))
@@ -63,7 +65,6 @@ int main (int argc, char **argv)
 	}
 
 	airportCreate(&sTheAirport, &sStats);
-	printHeader();
 
 	do
 	{
@@ -73,9 +74,14 @@ int main (int argc, char **argv)
 		}
 		decrementFuel(&sTheAirport);
 		updateAirport(&sTheAirport, &sStats);
+		if (counter % HEADER_PRINT == 0)
+		{
+			printHeader();
+		}
 		airportPrintRow(&sTheAirport, &sStats);
 		airportIncrementTimer(&sTheAirport);
 		setNextTurn(&sTheAirport, &sStats);
+		counter++;
 	}	while ((!(emptyAirportRunway(&sTheAirport)) ||
 			 (!(emptyAirportInFlightPQ(&sTheAirport)))) || (!feof(fPtr)));
 

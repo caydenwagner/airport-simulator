@@ -49,8 +49,7 @@ bin/airport.o: src/airport.c include/airport.h \
 
 valgrind: bin/airportdriver bin/airporttestdriver
 	valgrind -v --leak-check=yes --track-origins=yes \
-	--leak-check=full --show-leak-kinds=all bin/airportdriver \
-	bin/airporttestdriver data/airport.txt
+	--leak-check=full --show-leak-kinds=all bin/airportdriver data/airport.txt
 
 clean:
 	rm -rf bin/*.o bin/airportdriver bin/airporttestdriver
